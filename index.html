@@ -15,23 +15,19 @@
       rel="stylesheet"
       href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
-    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="./node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
 
     <title>Pro Screen Recorder</title>
   </head>
   <body>
-    <div class="jumbotron">
-      <h1 class="display-4">Title</h1>
-      <p class="lead">Subtitle</p>
-      <hr class="my-4" />
-      <p>Content</p>
-    </div>
     <h1>Hello World!</h1>
     We are using Node.js <span id="node-version"></span>, Chromium
     <span id="chrome-version"></span>, and Electron
     <span id="electron-version"></span>.
+
+    <div id="id1">
+      <button id="startBtn">Record</button>
+      <button id="stopBtn">Stop</button>
+    </div>
 
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
