@@ -6,7 +6,6 @@
 // process.
 
 const { desktopCapturer } = require("electron");
-const { writeFile } = require("fs");
 
 var fs = require("fs");
 var streamsav;
@@ -22,7 +21,7 @@ desktopCapturer
       // if (source.name === "Entire Screen") {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
+          audio: true,
           video: {
             mandatory: {
               chromeMediaSource: "desktop",
@@ -44,7 +43,7 @@ desktopCapturer
     }
   });
 
-function handleStream(stream) {
+async function handleStream(stream) {
   var video = document.createElement("video");
 
   // const video = document.querySelector("video");
@@ -58,20 +57,21 @@ function handleStream(stream) {
   video.onloadedmetadata = (e) => video.play();
 }
 function writeStream1(stream) {
-  var options = { mimeType: "video/webm; codecs=vp9" };
+  var options = {
+    mimeType: "video/webm; codecs=vp9",
+  };
   mediaRecorder = new MediaRecorder(stream, options);
   mediaRecorder.ondataavailable = handleDataAvailable;
   mediaRecorder.onstop = handleStop;
 
   const startBtn = document.getElementById("startBtn");
   startBtn.onclick = (e) => {
-    mediaRecorder.start();
+    mediaRecorder.start(1000);
     startBtn.classList.add("is-danger");
     startBtn.innerText = "Recording";
   };
 
   const stopBtn = document.getElementById("stopBtn");
-
   stopBtn.onclick = (e) => {
     mediaRecorder.stop();
     startBtn.classList.remove("is-danger");
@@ -79,38 +79,37 @@ function writeStream1(stream) {
   };
 
   // Captures all recorded chunks
-  function handleDataAvailable(e) {
+  async function handleDataAvailable(e) {
     console.log("video data available");
     recordedChunks.push(e.data);
+    const blob = new Blob(recordedChunks, {
+      // type: "video/webm; codecs=vp9",
+    });
+
+    const buffer = Buffer.from(await blob.arrayBuffer());
+    streamsav.write(buffer);
+    recordedChunks = [];
+    // const filePath1 = "./test4.webm";
+
+    // console.log(filePath1);
+    // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
   }
 
   // Saves the video file on stop
   async function handleStop(e) {
-    const blob = new Blob(recordedChunks, {
-      type: "video/webm; codecs=vp9",
-    });
+    // fs.close;
+    console.log("hello finished");
+    // const blob = new Blob(recordedChunks, {
+    //   type: "video/webm; codecs=vp9",
+    // });
 
-    const buffer = Buffer.from(await blob.arrayBuffer());
+    // const buffer = Buffer.from(await blob.arrayBuffer());
 
-    const filePath = "./test3.webm";
+    // const filePath = "./test3.webm";
 
-    console.log(filePath);
+    // console.log(filePath);
 
-    writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-  }
-
-  function download() {
-    var blob = new Blob(recordedChunks, {
-      type: "video/webm",
-    });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = "test.webm";
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
   }
 }
 
