@@ -7,44 +7,64 @@
 
 const { desktopCapturer } = require("electron");
 var fs = require("fs");
-var streamsav;
-streamsav = fs.createWriteStream("./data.webm");
+// const { writeFile } = require("fs");
+
+var streamsav = fs.createWriteStream("./data.webm");
 
 var ffmpeg = require("fluent-ffmpeg");
 var command = ffmpeg();
 
 var recordedChunks = [];
 let mediaRecorder;
-// var audiodevices;
+const audioContext = new AudioContext();
+var audiodevices;
+var newStream;
 
-// navigator.mediaDevices.enumerateDevices().then((devices) => {
-//   audiodevices = devices.filter((d) => d.kind === "audioinput");
-//   console.log(audiodevices);
-// });
+navigator.mediaDevices.enumerateDevices().then((devices) => {
+  audiodevices = devices.filter((d) => d.kind === "audioinput");
+  for (const item of audiodevices) {
+    console.log(item);
+  }
+});
 
 async function setAudio() {
-  const audiostream = await navigator.mediaDevices.getUserMedia({
+  const audiostream1 = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId: "default",
+      autoGainControl: false,
+      latency: 0,
+      noiseSuppression: false,
+      channelCount: 2,
+      echoCancellation: false,
+    },
+  });
+  const audiostream2 = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId:
+        "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8",
+      autoGainControl: false,
+      latency: 0,
+      noiseSuppression: false,
+      channelCount: 2,
+      echoCancellation: false,
     },
   });
 
-  // var audio = document.createElement("audio");
+  var audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
+  var audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
 
-  // audio.srcObject = audiostream;
-  // audio.controls = true;
+  var dest = audioContext.createMediaStreamDestination();
 
-  // audio.autoplay = true;
+  audioIn_01.connect(dest);
+  audioIn_02.connect(dest);
 
-  // var element = document.getElementById("id1");
-  // element.appendChild(audio);
-  // audio.onloadedmetadata = (e) => audio.play();
-  return audiostream;
+  newStream = dest.stream;
+
+  return newStream;
 }
-var audio = setAudio();
 
 desktopCapturer
-  .getSources({ types: ["window", "screen", "audio"] })
+  .getSources({ types: ["window", "screen"] })
   .then(async (sources) => {
     for (const source of sources) {
       console.log(source.name);
@@ -61,9 +81,12 @@ desktopCapturer
             mandatory: {
               chromeMediaSource: "desktop",
               chromeMediaSourceId: source.id,
-              minWidth: 1280,
+              minWidth: 640,
+              maxWidth: 1080,
               // maxWidth: 1920,
-              minHeight: 720,
+              minHeight: 480,
+              maxHeight: 720,
+
               // maxHeight: 1080,
             },
           },
@@ -79,10 +102,22 @@ desktopCapturer
         //       return audios.getAudioTracks()[0];
         //     })
         // );
-        stream.addTrack((await audio).getTracks()[0]);
 
-        handleStream(stream);
+        // mainstream.addTrack((await setAudio("default")).getTracks()[0]);
+        // mainstream.addTrack(
+        //   (
+        //     await setAudio(
+        //       "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8"
+        //     )
+        //   ).getTracks()[0]
+        // );
+
+        stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
+        console.log(stream.getVideoTracks()[0].getSettings());
+        stream.addTrack((await setAudio()).getTracks()[0]);
+
         writeStream(stream);
+        handleStream(stream);
       } catch (e) {
         handleError(e);
       }
@@ -93,20 +128,18 @@ desktopCapturer
 
 async function handleStream(stream) {
   var video = document.createElement("video");
-
   video.srcObject = stream;
   video.width = "200";
   video.autoplay = true;
-
   video.muted = true;
-
   var element = document.getElementById("id1");
   element.appendChild(video);
   video.onloadedmetadata = (e) => video.play();
 }
-function writeStream(stream) {
+
+async function writeStream(stream) {
   var options = {
-    // mimeType: "video/webm; codecs=vp9",
+    mimeType: "video/webm; codecs=vp9",
   };
   mediaRecorder = new MediaRecorder(stream, options);
 
@@ -141,7 +174,10 @@ function writeStream(stream) {
   }
 
   async function handleStop(e) {
-    console.log("hello finished");
+    // stream.getTracks().forEach((track) => {
+    //   track.stop();
+    // });
+
     // const blob = new Blob(recordedChunks, {
     //   type: "video/webm; codecs=vp9",
     // });
@@ -153,6 +189,8 @@ function writeStream(stream) {
     // console.log(filePath);
 
     // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
+    // streamsav.close();
+    console.log("hello finished");
   }
 }
 
