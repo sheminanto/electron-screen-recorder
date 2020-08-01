@@ -6,12 +6,14 @@
 // process.
 
 const { desktopCapturer } = require("electron");
+
 var fs = require("fs");
 // const { writeFile } = require("fs");
 
 var streamsav = fs.createWriteStream("./data.webm");
 
 var ffmpeg = require("fluent-ffmpeg");
+const { chrome } = require("process");
 var command = ffmpeg();
 
 var recordedChunks = [];
@@ -20,12 +22,12 @@ const audioContext = new AudioContext();
 var audiodevices;
 var newStream;
 
-navigator.mediaDevices.enumerateDevices().then((devices) => {
-  audiodevices = devices.filter((d) => d.kind === "audioinput");
-  for (const item of audiodevices) {
-    console.log(item);
-  }
-});
+// navigator.mediaDevices.enumerateDevices().then((devices) => {
+//   audiodevices = devices.filter((d) => d.kind === "audioinput");
+//   for (const item of audiodevices) {
+//     console.log(item);
+//   }
+// });
 
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
@@ -112,7 +114,7 @@ desktopCapturer
         //   ).getTracks()[0]
         // );
 
-        stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
+        stream.getVideoTracks()[0].applyConstraints({ frameRate: 35 });
         console.log(stream.getVideoTracks()[0].getSettings());
         stream.addTrack((await setAudio()).getTracks()[0]);
 
