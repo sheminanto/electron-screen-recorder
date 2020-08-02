@@ -1,0 +1,54 @@
+body {
+  /* border-radius: 10px; */
+
+  outline: none;
+  border: none;
+  text-decoration: none;
+}
+
+.skin-blue .wrapper {
+  background-color: #e8e8e8;
+}
+.skin-blue .titlebar {
+  background-color: #145374;
+  color: white;
+  -webkit-app-region: drag;
+}
+.skin-blue .titlebar a {
+  color: white;
+}
+.skin-blue .titlebar a:hover {
+  color: #5588a3;
+}
+.skin-blue .titlebar a:active {
+  color: #00334e;
+}
+.skin-blue .titlebar a:visited {
+  color: white;
+}
+
+.wrapper {
+  height: 500px;
+  width: 500px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px #17202a;
+}
+
+.wrapper .titlebar {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  height: 32px;
+}
+
+.wrapper .titlebar p {
+  float: left;
+  padding-left: 5px;
+  margin: 0;
+}
+
+.wrapper .titlebar a {
+  padding-top: 8px;
+  float: right;
+  padding-right: 5px;
+  text-decoration: none;
+}

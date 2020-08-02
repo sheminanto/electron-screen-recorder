@@ -6,11 +6,10 @@
 // process.
 
 const { desktopCapturer } = require("electron");
+var path = require("path");
 
 var fs = require("fs");
 // const { writeFile } = require("fs");
-
-var streamsav = fs.createWriteStream("./data.webm");
 
 var ffmpeg = require("fluent-ffmpeg");
 const { chrome } = require("process");
@@ -21,36 +20,43 @@ let mediaRecorder;
 const audioContext = new AudioContext();
 var audiodevices;
 var newStream;
+var a = "shemin";
+console.log(`a is ${a}`);
 
-// navigator.mediaDevices.enumerateDevices().then((devices) => {
-//   audiodevices = devices.filter((d) => d.kind === "audioinput");
-//   for (const item of audiodevices) {
-//     console.log(item);
-//   }
-// });
+navigator.mediaDevices.enumerateDevices().then((devices) => {
+  audiodevices = devices.filter((d) => d.kind === "audioinput");
+  for (const item of audiodevices) {
+    console.log(item);
+  }
+});
 
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId: "default",
       autoGainControl: false,
-      latency: 0,
+      latency: 0.01,
       noiseSuppression: false,
       channelCount: 2,
       echoCancellation: false,
+      sampleSize: 16,
     },
   });
+
   const audiostream2 = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId:
         "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8",
       autoGainControl: false,
-      latency: 0,
+      latency: 0.01,
       noiseSuppression: false,
       channelCount: 2,
       echoCancellation: false,
+      sampleSize: 16,
     },
   });
+  console.log(audiostream1.getAudioTracks()[0].getSettings());
+  console.log(audiostream2.getAudioTracks()[0].getSettings());
 
   var audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
   var audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
@@ -64,7 +70,7 @@ async function setAudio() {
 
   return newStream;
 }
-
+console.log(navigator.getVRDisplays);
 desktopCapturer
   .getSources({ types: ["window", "screen"] })
   .then(async (sources) => {
@@ -114,9 +120,11 @@ desktopCapturer
         //   ).getTracks()[0]
         // );
 
-        stream.getVideoTracks()[0].applyConstraints({ frameRate: 35 });
+        stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
         console.log(stream.getVideoTracks()[0].getSettings());
+
         stream.addTrack((await setAudio()).getTracks()[0]);
+        console.log(stream.getAudioTracks()[0].getSettings());
 
         writeStream(stream);
         handleStream(stream);
@@ -139,7 +147,35 @@ async function handleStream(stream) {
   video.onloadedmetadata = (e) => video.play();
 }
 
+function fileCheck(filePath, fileName, fileExt, _fileCount) {
+  var tempName = "";
+  try {
+    fileName = path.basename(filePath + fileName, fileExt);
+    _fileCount == 0 ? (tempName = "") : (tempName = `(${_fileCount})`);
+    if (fs.existsSync(filePath + fileName + tempName + fileExt)) {
+      _fileCount += 1;
+      console.log(fileName);
+      console.log("file exists");
+      fileName = fileCheck(filePath, fileName, fileExt, _fileCount);
+      return fileName;
+    } else {
+      console.log("file not exists");
+      return fileName + tempName;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function writeStream(stream) {
+  var filePath = "./recorded/";
+  var fileName = "data.webm";
+  var fileExt = ".webm";
+
+  fileName = fileCheck(filePath, fileName, fileExt, 0);
+
+  var streamsav = fs.createWriteStream(filePath + fileName + fileExt);
+
   var options = {
     mimeType: "video/webm; codecs=vp9",
   };
@@ -191,7 +227,7 @@ async function writeStream(stream) {
     // console.log(filePath);
 
     // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-    // streamsav.close();
+    streamsav.close();
     console.log("hello finished");
   }
 }
