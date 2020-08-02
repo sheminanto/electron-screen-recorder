@@ -19,9 +19,8 @@ var recordedChunks = [];
 let mediaRecorder;
 const audioContext = new AudioContext();
 var audiodevices;
-var newStream;
-var a = "shemin";
-console.log(`a is ${a}`);
+
+var streamsav;
 
 navigator.mediaDevices.enumerateDevices().then((devices) => {
   audiodevices = devices.filter((d) => d.kind === "audioinput");
@@ -66,75 +65,52 @@ async function setAudio() {
   audioIn_01.connect(dest);
   audioIn_02.connect(dest);
 
-  newStream = dest.stream;
-
-  return newStream;
+  return dest.stream;
 }
-console.log(navigator.getVRDisplays);
-desktopCapturer
-  .getSources({ types: ["window", "screen"] })
-  .then(async (sources) => {
-    for (const source of sources) {
-      console.log(source.name);
-      // if (source.name === "Entire Screen") {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          // {
-          //   mandatory: {
-          //     chromeMediaSource: "desktop",
-          //   },
-          // },
-          video: {
-            mandatory: {
-              chromeMediaSource: "desktop",
-              chromeMediaSourceId: source.id,
-              minWidth: 640,
-              maxWidth: 1080,
-              // maxWidth: 1920,
-              minHeight: 480,
-              maxHeight: 720,
 
-              // maxHeight: 1080,
+function setScreen() {
+  desktopCapturer
+    .getSources({ types: ["window", "screen"] })
+    .then(async (sources) => {
+      for (const source of sources) {
+        console.log(source.name);
+        // if (source.name === "Entire Screen") {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+
+            video: {
+              mandatory: {
+                chromeMediaSource: "desktop",
+                chromeMediaSourceId: source.id,
+                minWidth: 640,
+                maxWidth: 1080,
+                // maxWidth: 1920,
+                minHeight: 480,
+                maxHeight: 720,
+
+                // maxHeight: 1080,
+              },
             },
-          },
-        });
-        // stream.addTrack(
-        //   await navigator.mediaDevices
-        //     .getUserMedia({
-        //       audio: {
-        //         deviceId: "default",
-        //       },
-        //     })
-        //     .then((audios) => {
-        //       return audios.getAudioTracks()[0];
-        //     })
-        // );
+          });
 
-        // mainstream.addTrack((await setAudio("default")).getTracks()[0]);
-        // mainstream.addTrack(
-        //   (
-        //     await setAudio(
-        //       "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8"
-        //     )
-        //   ).getTracks()[0]
-        // );
+          stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
+          console.log(stream.getVideoTracks()[0].getSettings());
 
-        stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
-        console.log(stream.getVideoTracks()[0].getSettings());
+          stream.addTrack((await setAudio()).getTracks()[0]);
+          console.log(stream.getAudioTracks()[0].getSettings());
 
-        stream.addTrack((await setAudio()).getTracks()[0]);
-        console.log(stream.getAudioTracks()[0].getSettings());
-
-        writeStream(stream);
-        handleStream(stream);
-      } catch (e) {
-        handleError(e);
+          writeStream(stream);
+          handleStream(stream);
+        } catch (e) {
+          handleError(e);
+        }
+        return;
+        // }
       }
-      return;
-      // }
-    }
-  });
+    });
+}
+setScreen();
 
 async function handleStream(stream) {
   var video = document.createElement("video");
@@ -172,10 +148,6 @@ async function writeStream(stream) {
   var fileName = "data.webm";
   var fileExt = ".webm";
 
-  fileName = fileCheck(filePath, fileName, fileExt, 0);
-
-  var streamsav = fs.createWriteStream(filePath + fileName + fileExt);
-
   var options = {
     mimeType: "video/webm; codecs=vp9",
   };
@@ -186,6 +158,12 @@ async function writeStream(stream) {
 
   const startBtn = document.getElementById("startBtn");
   startBtn.onclick = (e) => {
+    filePath = "./recorded/";
+    fileName = "data.webm";
+    fileExt = ".webm";
+    fileName = fileCheck(filePath, fileName, fileExt, 0);
+    streamsav = fs.createWriteStream(filePath + fileName + fileExt);
+
     mediaRecorder.start(1000);
     startBtn.classList.add("is-danger");
     startBtn.innerText = "Recording";
@@ -193,7 +171,12 @@ async function writeStream(stream) {
 
   const stopBtn = document.getElementById("stopBtn");
   stopBtn.onclick = (e) => {
-    mediaRecorder.stop();
+    try {
+      mediaRecorder.stop();
+    } catch (error) {
+      console.log(error);
+    }
+
     startBtn.classList.remove("is-danger");
     startBtn.innerText = "Start";
   };
@@ -227,7 +210,11 @@ async function writeStream(stream) {
     // console.log(filePath);
 
     // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-    streamsav.close();
+    streamsav.on("finish", function () {
+      streamsav.end();
+      console.log("finished now");
+    });
+
     console.log("hello finished");
   }
 }
