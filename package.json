@@ -23,6 +23,7 @@
     "@popperjs/core": "^2.4.4",
     "bootstrap": "^4.5.0",
     "fluent-ffmpeg": "^2.1.2",
+    "hark": "^1.2.3",
     "jquery": "^3.5.1"
   }
 }

@@ -8,17 +8,17 @@
 const { desktopCapturer } = require("electron");
 var path = require("path");
 var fs = require("fs");
+var Hark = require("hark");
 
 var ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
 ffmpeg.setFfprobePath("./win-ffmpeg/bin");
 
 var recordedChunks = [];
-let mediaRecorder;
+var mediaRecorder;
 const audioContext = new AudioContext();
 var audiodevices;
 var streamsav;
-var ffmpegoutstream = fs.createWriteStream("./recorded/testff.mp4");
 
 // navigator.mediaDevices.enumerateDevices().then((devices) => {
 //   audiodevices = devices.filter((d) => d.kind === "audioinput");
@@ -27,15 +27,16 @@ var ffmpegoutstream = fs.createWriteStream("./recorded/testff.mp4");
 //   }
 // });
 
+var audstream;
+
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId: "default",
       autoGainControl: false,
-      latency: 0.01,
-      noiseSuppression: false,
+      latency: 0.0,
+      noiseSuppression: true,
       channelCount: 2,
-      echoCancellation: false,
       sampleSize: 16,
     },
   });
@@ -45,10 +46,9 @@ async function setAudio() {
       deviceId:
         "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8",
       autoGainControl: false,
-      latency: 0.01,
-      noiseSuppression: false,
+      latency: 0.0,
+      noiseSuppression: true,
       channelCount: 2,
-      echoCancellation: false,
       sampleSize: 16,
     },
   });
@@ -82,12 +82,12 @@ function setScreen() {
                 chromeMediaSource: "desktop",
                 chromeMediaSourceId: source.id,
                 minWidth: 640,
-                maxWidth: 1080,
-                // maxWidth: 1920,
+                // maxWidth: 1080,
+                maxWidth: 1920,
                 minHeight: 480,
-                maxHeight: 720,
+                // maxHeight: 720,
 
-                // maxHeight: 1080,
+                maxHeight: 1080,
               },
             },
           });
@@ -95,8 +95,16 @@ function setScreen() {
           stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
           // console.log(stream.getVideoTracks()[0].getSettings());
 
-          stream.addTrack((await setAudio()).getTracks()[0]);
+          // stream.addTrack((await setAudio()).getTracks()[0]);
           // console.log(stream.getAudioTracks()[0].getSettings());
+
+          audstream = await setAudio();
+          stream.addTrack(audstream.getAudioTracks()[0]);
+
+          // var audioMonitor = new Hark(audstream);
+          // audioMonitor.on("volume_change", function (volume) {
+          //   console.log("volume change " + volume);
+          // });
 
           writeStream(stream);
           handleStream(stream);
@@ -142,12 +150,16 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
 }
 
 async function writeStream(stream) {
-  var filePath = "./recorded/";
-  var fileName = "data.webm";
-  var fileExt = ".webm";
+  var filePath;
+  var fileName;
+  var fileExt;
+  var blob;
+  var buffer;
 
   var options = {
-    mimeType: "video/webm; codecs=vp9",
+    mimeType: "video/webm; codecs=vp9,opus",
+    audioBitsPerSecond: 92000,
+    videoBitsPerSecond: 1000000,
   };
   mediaRecorder = new MediaRecorder(stream, options);
 
@@ -183,13 +195,12 @@ async function writeStream(stream) {
   async function handleDataAvailable(e) {
     console.log("video data available");
     recordedChunks.push(e.data);
-    const blob = new Blob(recordedChunks, {
-      type: "video/webm; codecs=vp9",
+    blob = new Blob(recordedChunks, {
+      type: "video/webm; codecs=vp9 ",
     });
 
-    const buffer = Buffer.from(await blob.arrayBuffer());
+    buffer = Buffer.from(await blob.arrayBuffer());
     streamsav.write(buffer);
-
     recordedChunks = [];
   }
 
