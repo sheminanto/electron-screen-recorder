@@ -7,27 +7,25 @@
 
 const { desktopCapturer } = require("electron");
 var path = require("path");
-
 var fs = require("fs");
-// const { writeFile } = require("fs");
 
 var ffmpeg = require("fluent-ffmpeg");
-const { chrome } = require("process");
-var command = ffmpeg();
+ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
+ffmpeg.setFfprobePath("./win-ffmpeg/bin");
 
 var recordedChunks = [];
 let mediaRecorder;
 const audioContext = new AudioContext();
 var audiodevices;
-
 var streamsav;
+var ffmpegoutstream = fs.createWriteStream("./recorded/testff.mp4");
 
-navigator.mediaDevices.enumerateDevices().then((devices) => {
-  audiodevices = devices.filter((d) => d.kind === "audioinput");
-  for (const item of audiodevices) {
-    console.log(item);
-  }
-});
+// navigator.mediaDevices.enumerateDevices().then((devices) => {
+//   audiodevices = devices.filter((d) => d.kind === "audioinput");
+//   for (const item of audiodevices) {
+//     console.log(item);
+//   }
+// });
 
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
@@ -54,8 +52,8 @@ async function setAudio() {
       sampleSize: 16,
     },
   });
-  console.log(audiostream1.getAudioTracks()[0].getSettings());
-  console.log(audiostream2.getAudioTracks()[0].getSettings());
+  // console.log(audiostream1.getAudioTracks()[0].getSettings());
+  // console.log(audiostream2.getAudioTracks()[0].getSettings());
 
   var audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
   var audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
@@ -95,10 +93,10 @@ function setScreen() {
           });
 
           stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
-          console.log(stream.getVideoTracks()[0].getSettings());
+          // console.log(stream.getVideoTracks()[0].getSettings());
 
           stream.addTrack((await setAudio()).getTracks()[0]);
-          console.log(stream.getAudioTracks()[0].getSettings());
+          // console.log(stream.getAudioTracks()[0].getSettings());
 
           writeStream(stream);
           handleStream(stream);
@@ -191,6 +189,7 @@ async function writeStream(stream) {
 
     const buffer = Buffer.from(await blob.arrayBuffer());
     streamsav.write(buffer);
+
     recordedChunks = [];
   }
 
@@ -210,10 +209,6 @@ async function writeStream(stream) {
     // console.log(filePath);
 
     // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-    streamsav.on("finish", function () {
-      streamsav.end();
-      console.log("finished now");
-    });
 
     console.log("hello finished");
   }
