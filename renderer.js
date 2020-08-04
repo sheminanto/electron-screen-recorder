@@ -6,19 +6,19 @@
 // process.
 
 const { desktopCapturer } = require("electron");
-var path = require("path");
-var fs = require("fs");
-var Hark = require("hark");
+let path = require("path");
+let fs = require("fs");
+let Hark = require("hark");
 
-var ffmpeg = require("fluent-ffmpeg");
+let ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
 ffmpeg.setFfprobePath("./win-ffmpeg/bin");
 
-var recordedChunks = [];
-var mediaRecorder;
-const audioContext = new AudioContext();
-var audiodevices;
-var streamsav;
+let recordedChunks = [];
+let mediaRecorder;
+let audioContext = new AudioContext();
+let audiodevices;
+let streamsav;
 
 // navigator.mediaDevices.enumerateDevices().then((devices) => {
 //   audiodevices = devices.filter((d) => d.kind === "audioinput");
@@ -27,7 +27,7 @@ var streamsav;
 //   }
 // });
 
-var audstream;
+let audstream;
 
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
@@ -55,10 +55,10 @@ async function setAudio() {
   // console.log(audiostream1.getAudioTracks()[0].getSettings());
   // console.log(audiostream2.getAudioTracks()[0].getSettings());
 
-  var audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
-  var audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
+  let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
+  let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
 
-  var dest = audioContext.createMediaStreamDestination();
+  let dest = audioContext.createMediaStreamDestination();
 
   audioIn_01.connect(dest);
   audioIn_02.connect(dest);
@@ -81,6 +81,7 @@ function setScreen() {
               mandatory: {
                 chromeMediaSource: "desktop",
                 chromeMediaSourceId: source.id,
+
                 minWidth: 640,
                 // maxWidth: 1080,
                 maxWidth: 1920,
@@ -92,7 +93,7 @@ function setScreen() {
             },
           });
 
-          stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
+          stream.getVideoTracks()[0].applyConstraints({ frameRate: 10 });
           // console.log(stream.getVideoTracks()[0].getSettings());
 
           // stream.addTrack((await setAudio()).getTracks()[0]);
@@ -101,7 +102,7 @@ function setScreen() {
           audstream = await setAudio();
           stream.addTrack(audstream.getAudioTracks()[0]);
 
-          // var audioMonitor = new Hark(audstream);
+          // let audioMonitor = new Hark(audstream);
           // audioMonitor.on("volume_change", function (volume) {
           //   console.log("volume change " + volume);
           // });
@@ -119,18 +120,18 @@ function setScreen() {
 setScreen();
 
 async function handleStream(stream) {
-  var video = document.createElement("video");
+  let video = document.createElement("video");
   video.srcObject = stream;
   video.width = "200";
   video.autoplay = true;
   video.muted = true;
-  var element = document.getElementById("id1");
+  let element = document.getElementById("id1");
   element.appendChild(video);
   video.onloadedmetadata = (e) => video.play();
 }
 
 function fileCheck(filePath, fileName, fileExt, _fileCount) {
-  var tempName = "";
+  let tempName = "";
   try {
     fileName = path.basename(filePath + fileName, fileExt);
     _fileCount == 0 ? (tempName = "") : (tempName = `(${_fileCount})`);
@@ -150,13 +151,13 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
 }
 
 async function writeStream(stream) {
-  var filePath;
-  var fileName;
-  var fileExt;
-  var blob;
-  var buffer;
+  let filePath;
+  let fileName;
+  let fileExt;
+  let blob;
+  let buffer;
 
-  var options = {
+  let options = {
     mimeType: "video/webm; codecs=vp9,opus",
     audioBitsPerSecond: 92000,
     videoBitsPerSecond: 1000000,

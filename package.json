@@ -1,18 +1,16 @@
 {
-  "name": "electron-quick-start",
+  "name": "electron-screen-recorder",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/sheminanto/electron-screen-recorder",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "screen",
+    "recorder"
   ],
   "author": "GitHub",
   "license": "CC0-1.0",
