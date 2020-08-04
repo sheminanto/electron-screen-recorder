@@ -93,7 +93,7 @@ function setScreen() {
             },
           });
 
-          stream.getVideoTracks()[0].applyConstraints({ frameRate: 10 });
+          stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
           // console.log(stream.getVideoTracks()[0].getSettings());
 
           // stream.addTrack((await setAudio()).getTracks()[0]);
@@ -102,10 +102,14 @@ function setScreen() {
           audstream = await setAudio();
           stream.addTrack(audstream.getAudioTracks()[0]);
 
-          // let audioMonitor = new Hark(audstream);
-          // audioMonitor.on("volume_change", function (volume) {
-          //   console.log("volume change " + volume);
-          // });
+          let progressBAr = document.getElementById("progress-1");
+
+          let audioMonitor = new Hark(audstream, { interval: 100 });
+          audioMonitor.on("volume_change", (volume) => {
+            progressBAr.style.width = `${volume + 100}%`;
+            console.log("timiout");
+            console.log("volume change " + volume);
+          });
 
           writeStream(stream);
           handleStream(stream);
