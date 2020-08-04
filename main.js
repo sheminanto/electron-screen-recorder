@@ -7,14 +7,15 @@ const path = require("path");
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 500,
+    width: 400,
+    height: 600,
 
     webPreferences: {
       nodeIntegration: true,
       //   preload: path.join(__dirname, "renderer.js"),
     },
   });
+  mainWindow.setMenuBarVisibility(false);
 
   // and load the index.html of the app.
   mainWindow.loadFile("index.html");
