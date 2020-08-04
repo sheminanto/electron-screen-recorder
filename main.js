@@ -7,8 +7,9 @@ const path = require("path");
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 400,
-    height: 600,
+    resizable: false,
+    width: 300,
+    height: 500,
 
     webPreferences: {
       nodeIntegration: true,
@@ -18,7 +19,7 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false);
 
   // and load the index.html of the app.
-  mainWindow.loadFile("index.html");
+  mainWindow.loadFile("./index.html");
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

@@ -20,12 +20,12 @@ let audioContext = new AudioContext();
 let audiodevices;
 let streamsav;
 
-// navigator.mediaDevices.enumerateDevices().then((devices) => {
-//   audiodevices = devices.filter((d) => d.kind === "audioinput");
-//   for (const item of audiodevices) {
-//     console.log(item);
-//   }
-// });
+navigator.mediaDevices.enumerateDevices().then((devices) => {
+  audiodevices = devices.filter((d) => d.kind === "audioinput");
+  for (const item of audiodevices) {
+    console.log(item);
+  }
+});
 
 let audstream;
 
@@ -44,7 +44,7 @@ async function setAudio() {
   const audiostream2 = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId:
-        "93a5d0fc38f85fefb46f4a8868ef9d5241d526c142d0b6bc059dbc01fa7ca7e8",
+        "ef454260e26728a3175e9b04546e19d73c0f59a0a57c6076fc42ac33bde4d760",
       autoGainControl: false,
       latency: 0.0,
       noiseSuppression: true,

@@ -3,35 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
       Content-Security-Policy="default-src 'self'; img-src '*'; media-src '*'; script-src 'self'"
     />
     <meta
       http-equiv="X-Content-Security-Policy"
       Content-Security-Policy="default-src 'self'; img-src '*'; media-src '*'; script-src 'self'"
+    /> -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
 
     <link
       rel="stylesheet"
       href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
-    <!-- <script>
-      if (typeof module === "object") {
-        window.module = module;
-        module = undefined;
-      }
-    </script> -->
 
     <script>
-      window.$ = window.jQuery = require("./node_modules/jquery/dist/jquery.min.js");
+      window.$ = window.jQuery = require("./node_modules/jquery");
     </script>
-    <!-- <script src="./node_modules/jquery/dist/jquery.slim.min.js"></script> -->
-    <script src="./node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
-    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- <script>
-      if (window.module) module = window.module;
-    </script> -->
 
     <title>Pro Screen Recorder</title>
   </head>
@@ -79,9 +71,59 @@
       <button id="startBtn">Record</button>
       <button id="stopBtn">Stop</button>
     </div>
+    <div class="container pt-3">
+      <div class="row justify-content-center">
+        <div class="dropdown">
+          <button
+            class="btn btn-muted dropdown-toggle border-secondary"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Audio input
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a
+              class="dropdown-item"
+              href="#"
+              onclick="document.getElementById('dropdownMenuButton').innerText='item 1'"
+              >Action
+            </a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="progress" style="height: 10px;">
+        <div
+          class="progress-bar"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          style="width: 50%;"
+        ></div>
+      </div>
+    </div>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-    <!-- <script src="./sample.js"></script> -->
+    <!-- <script src="./renderer.js"></script> -->
+
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script src="./static/popper/popper.js"></script>
+
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
   </body>
 </html>

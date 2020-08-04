@@ -15,10 +15,9 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^9.1.1"
+    "electron": "^9.1.2"
   },
   "dependencies": {
-    "@popperjs/core": "^2.4.4",
     "bootstrap": "^4.5.0",
     "fluent-ffmpeg": "^2.1.2",
     "hark": "^1.2.3",
