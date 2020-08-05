@@ -9,20 +9,22 @@ const { desktopCapturer } = require("electron");
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
-const nativeImage = require("electron").nativeImage;
 
-let ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
-ffmpeg.setFfprobePath("./win-ffmpeg/bin");
+// let ffmpeg = require("fluent-ffmpeg");
+// ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
+// ffmpeg.setFfprobePath("./win-ffmpeg/bin");
 
 let recordedChunks = [];
 let mediaRecorder;
 let audioContext = new AudioContext();
+let dest = audioContext.createMediaStreamDestination();
 let audiodevices;
 let streamsav;
 let _screenWidth;
 let _screenHeight;
 let _recordingState = false;
+let audstream;
+let _audioSources;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -36,21 +38,45 @@ async function getAudioSources() {
   });
 }
 
-getAudioSources().then((sources) => {
-  let _dropDownAudioInput = document.getElementById("dropdown-audioinput");
-  let _dropDownitem;
+_audioSources = getAudioSources();
 
+_audioSources.then((sources) => {
+  let _dropDownAudioInput = document.getElementById("dropdown-audioinput");
+  let innerHtml;
   for (const source of sources) {
-    _dropDownitem = document.createElement("a");
-    _dropDownitem.className = "dropdown-item";
-    _dropDownitem.href = "#";
-    _dropDownitem.innerText = source.label;
+    innerHtml = `<form><div class='custom-control custom-switch'><input type='checkbox' class='custom-control-input' id='${source.deviceId}' /><label class='custom-control-label' for='${source.deviceId}'>${source.label}</label></div></form>`;
+    let _dropDownitem = document.createElement("a");
+    _dropDownitem.className = "dropdown-item ";
+    _dropDownitem.innerHTML = innerHtml;
     _dropDownAudioInput.appendChild(_dropDownitem);
-    console.log(source);
+    document
+      .getElementById(source.deviceId)
+      .addEventListener("change", (change) => {
+        if (change.target.checked) {
+          console.log("true");
+        } else {
+          console.log("false");
+        }
+      });
+
+    // let state = false;
+    // let _dropDownitem = document.createElement("a");
+    // _dropDownitem.className = "dropdown-item ";
+    // _dropDownitem.addEventListener("click", (e) => {
+    //   if (state == false) {
+    //     _dropDownitem.classList.add("active");
+    //     state = true;
+    //   } else {
+    //     _dropDownitem.classList.remove("active");
+    //     state = false;
+    //   }
+    // });
+    // _dropDownitem.href = "#";
+    // _dropDownitem.innerText = source.label;
+    // _dropDownAudioInput.appendChild(_dropDownitem);
+    // console.log(source);
   }
 });
-
-let audstream;
 
 async function setAudio() {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
@@ -80,8 +106,6 @@ async function setAudio() {
 
   let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
   let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
-
-  let dest = audioContext.createMediaStreamDestination();
 
   audioIn_01.connect(dest);
   audioIn_02.connect(dest);
@@ -148,6 +172,7 @@ function setScreen() {
           audioMonitor.on("volume_change", (volume) => {
             progressBAr.style.width = `${volume + 120}%`;
           });
+          // stream.getTracks().forEach((track) => track.stop());
 
           writeStream(stream);
           // handleStream(stream);

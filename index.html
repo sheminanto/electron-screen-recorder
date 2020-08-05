@@ -21,9 +21,9 @@
       href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
 
-    <script>
+    <!-- <script>
       window.$ = window.jQuery = require("./node_modules/jquery");
-    </script>
+    </script> -->
 
     <title>Pro Screen Recorder</title>
   </head>
@@ -42,19 +42,13 @@
             style="width: 250px;"
           >
             Audio input
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
           </button>
           <div
-            class="dropdown-menu"
+            class="dropdown-menu dropdown-menu-right"
             aria-labelledby="dropdownMenuButton"
             id="dropdown-audioinput"
-          >
-            <!-- <a
-              class="dropdown-item"
-              href="#"
-              onclick="document.getElementById('dropdownMenuButton').innerText='item 1'"
-              >Action
-            </a> -->
-          </div>
+          ></div>
         </div>
       </div>
 
@@ -83,8 +77,6 @@
       </div>
     </div>
 
-    <script src="./renderer.js"></script>
-
     <script>
       if (typeof module === "object") {
         window.module = module;
@@ -92,12 +84,11 @@
       }
     </script>
     <script src="./node_modules/jquery/dist/jquery.min.js"></script>
-
     <script src="./static/popper/popper.js"></script>
-
     <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script>
       if (window.module) module = window.module;
     </script>
+    <script src="./renderer.js"></script>
   </body>
 </html>
