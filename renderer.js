@@ -20,8 +20,8 @@ let audioContext = new AudioContext();
 let dest = audioContext.createMediaStreamDestination();
 let audiodevices;
 let streamsav;
-let _screenWidth;
-let _screenHeight;
+let _screenWidth = 1980;
+let _screenHeight = 1080;
 let _recordingState = false;
 let audstream;
 let _audioSources;
@@ -40,21 +40,69 @@ async function getAudioSources() {
 
 _audioSources = getAudioSources();
 
-_audioSources.then((sources) => {
+_audioSources.then(async (sources) => {
   let _dropDownAudioInput = document.getElementById("dropdown-audioinput");
-  let innerHtml;
+  let _meterSection = document.getElementById("audio-meter-section");
+
   for (const source of sources) {
-    innerHtml = `<form><div class='custom-control custom-switch'><input type='checkbox' class='custom-control-input' id='${source.deviceId}' /><label class='custom-control-label' for='${source.deviceId}'>${source.label}</label></div></form>`;
+    let stream;
+    let audioMonitor;
+    let _audioMeter = document.createElement("div");
     let _dropDownitem = document.createElement("a");
+    let progressBAr;
+    _audioMeter.className = `row pt-4 `;
+    _audioMeter.innerHTML = ` <div class="col">
+      <div class="progress" style="height: 10px;">
+        <div
+          class="progress-bar"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          id="audio-meter-${source.deviceId}"
+        ></div>
+      </div>
+    </div>`;
+
     _dropDownitem.className = "dropdown-item ";
-    _dropDownitem.innerHTML = innerHtml;
+    _dropDownitem.innerHTML = `<form>
+    <div class="custom-control custom-switch">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="${source.deviceId}"
+      />
+      <label class="custom-control-label" for="${source.deviceId}">
+        ${source.label}
+      </label>
+    </div>
+  </form>`;
     _dropDownAudioInput.appendChild(_dropDownitem);
     document
       .getElementById(source.deviceId)
       .addEventListener("change", (change) => {
         if (change.target.checked) {
+          _meterSection.appendChild(_audioMeter);
+          progressBAr = document.getElementById(
+            `audio-meter-${source.deviceId}`
+          );
+          setAudio(source).then((res) => {
+            stream = res;
+            audioMonitor = new Hark(res.mediaStream, {
+              interval: 110,
+              threshold: -120,
+            });
+            audioMonitor.on("volume_change", (volume) => {
+              progressBAr.style.width = `${volume + 120}%`;
+            });
+            console.log(res.mediaStream.getAudioTracks()[0].readyState);
+          });
           console.log("true");
         } else {
+          _audioMeter.remove();
+          audioMonitor.stop();
+          stream.mediaStream.getTracks().forEach((item) => item.stop());
+          console.log(stream.mediaStream.getAudioTracks()[0].readyState);
+          progressBAr.style.width = "0%";
           console.log("false");
         }
       });
@@ -78,10 +126,10 @@ _audioSources.then((sources) => {
   }
 });
 
-async function setAudio() {
+async function setAudio(source) {
   const audiostream1 = await navigator.mediaDevices.getUserMedia({
     audio: {
-      deviceId: "default",
+      deviceId: source.deviceId,
       autoGainControl: false,
       latency: 0.0,
       noiseSuppression: true,
@@ -90,27 +138,35 @@ async function setAudio() {
     },
   });
 
-  const audiostream2 = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      deviceId:
-        "ef454260e26728a3175e9b04546e19d73c0f59a0a57c6076fc42ac33bde4d760",
-      autoGainControl: false,
-      latency: 0.0,
-      noiseSuppression: true,
-      channelCount: 2,
-      sampleSize: 16,
-    },
-  });
+  // const audiostream2 = await navigator.mediaDevices.getUserMedia({
+  //   audio: {
+  //     deviceId:
+  //       "ef454260e26728a3175e9b04546e19d73c0f59a0a57c6076fc42ac33bde4d760",
+  //     autoGainControl: false,
+  //     latency: 0.0,
+  //     noiseSuppression: true,
+  //     channelCount: 2,
+  //     sampleSize: 16,
+  //   },
+  // });
   // console.log(audiostream1.getAudioTracks()[0].getSettings());
   // console.log(audiostream2.getAudioTracks()[0].getSettings());
+  audiostream1.getTracks().forEach(
+    (item) =>
+      (item.onended = function () {
+        console.log("audio stream ended " + source.label);
+      })
+  );
 
   let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
-  let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
+  // let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
 
   audioIn_01.connect(dest);
-  audioIn_02.connect(dest);
+  // audioIn_02.connect(dest);
 
-  return dest.stream;
+  return audioIn_01;
+
+  // return dest.stream;
 }
 
 async function getScreenSources() {
@@ -137,19 +193,14 @@ function setScreen() {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
-
             video: {
               mandatory: {
                 chromeMediaSource: "desktop",
                 chromeMediaSourceId: source.id,
-
                 minWidth: 640,
-                // maxWidth: 1080,
-                maxWidth: 1920,
+                maxWidth: _screenWidth,
                 minHeight: 480,
-                // maxHeight: 720,
-
-                maxHeight: 1080,
+                maxHeight: _screenHeight,
               },
             },
           });
@@ -184,7 +235,7 @@ function setScreen() {
       }
     });
 }
-setScreen();
+// setScreen();
 
 async function handleStream(stream) {
   let video = document.createElement("video");
