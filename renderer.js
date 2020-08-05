@@ -9,6 +9,7 @@ const { desktopCapturer } = require("electron");
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
+const nativeImage = require("electron").nativeImage;
 
 let ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
@@ -19,11 +20,33 @@ let mediaRecorder;
 let audioContext = new AudioContext();
 let audiodevices;
 let streamsav;
+let _screenWidth;
+let _screenHeight;
+let _recordingState = false;
 
-navigator.mediaDevices.enumerateDevices().then((devices) => {
-  audiodevices = devices.filter((d) => d.kind === "audioinput");
-  for (const item of audiodevices) {
-    console.log(item);
+async function getAudioSources() {
+  return navigator.mediaDevices.enumerateDevices().then((devices) => {
+    audiodevices = devices.filter(
+      (d) =>
+        d.kind === "audioinput" &&
+        d.deviceId != "communications" &&
+        d.deviceId != "default"
+    );
+    return audiodevices;
+  });
+}
+
+getAudioSources().then((sources) => {
+  let _dropDownAudioInput = document.getElementById("dropdown-audioinput");
+  let _dropDownitem;
+
+  for (const source of sources) {
+    _dropDownitem = document.createElement("a");
+    _dropDownitem.className = "dropdown-item";
+    _dropDownitem.href = "#";
+    _dropDownitem.innerText = source.label;
+    _dropDownAudioInput.appendChild(_dropDownitem);
+    console.log(source);
   }
 });
 
@@ -66,6 +89,20 @@ async function setAudio() {
   return dest.stream;
 }
 
+async function getScreenSources() {
+  return await desktopCapturer.getSources({
+    types: ["window", "screen"],
+  });
+}
+
+// getScreenSources().then((sources) => {
+//   for (const source of sources) {
+//     let img1 = document.createElement("img");
+//     img1.src = source.thumbnail.toDataURL();
+//     document.getElementById("id1").appendChild(img1);
+//   }
+// });
+
 function setScreen() {
   desktopCapturer
     .getSources({ types: ["window", "screen"] })
@@ -104,15 +141,16 @@ function setScreen() {
 
           let progressBAr = document.getElementById("progress-1");
 
-          let audioMonitor = new Hark(audstream, { interval: 100 });
+          let audioMonitor = new Hark(audstream, {
+            interval: 110,
+            threshold: -120,
+          });
           audioMonitor.on("volume_change", (volume) => {
-            progressBAr.style.width = `${volume + 100}%`;
-            console.log("timiout");
-            console.log("volume change " + volume);
+            progressBAr.style.width = `${volume + 120}%`;
           });
 
           writeStream(stream);
-          handleStream(stream);
+          // handleStream(stream);
         } catch (e) {
           handleError(e);
         }
@@ -163,8 +201,8 @@ async function writeStream(stream) {
 
   let options = {
     mimeType: "video/webm; codecs=vp9,opus",
-    audioBitsPerSecond: 92000,
-    videoBitsPerSecond: 1000000,
+    // audioBitsPerSecond: 92000,
+    // videoBitsPerSecond: 1000000,
   };
   mediaRecorder = new MediaRecorder(stream, options);
 
@@ -173,27 +211,26 @@ async function writeStream(stream) {
 
   const startBtn = document.getElementById("startBtn");
   startBtn.onclick = (e) => {
-    filePath = "./recorded/";
-    fileName = "data.webm";
-    fileExt = ".webm";
-    fileName = fileCheck(filePath, fileName, fileExt, 0);
-    streamsav = fs.createWriteStream(filePath + fileName + fileExt);
-
-    mediaRecorder.start(1000);
-    startBtn.classList.add("is-danger");
-    startBtn.innerText = "Recording";
-  };
-
-  const stopBtn = document.getElementById("stopBtn");
-  stopBtn.onclick = (e) => {
-    try {
-      mediaRecorder.stop();
-    } catch (error) {
-      console.log(error);
+    if (_recordingState == false) {
+      filePath = "./recorded/";
+      fileName = "data.webm";
+      fileExt = ".webm";
+      fileName = fileCheck(filePath, fileName, fileExt, 0);
+      streamsav = fs.createWriteStream(filePath + fileName + fileExt);
+      mediaRecorder.start(1000);
+      startBtn.className = "btn btn-danger";
+      startBtn.innerText = "Stop Recording";
+      _recordingState = true;
+    } else {
+      try {
+        mediaRecorder.stop();
+      } catch (error) {
+        console.log(error);
+      }
+      startBtn.className = "btn btn-success";
+      startBtn.innerText = "Start Recording";
+      _recordingState = false;
     }
-
-    startBtn.classList.remove("is-danger");
-    startBtn.innerText = "Start";
   };
 
   // Captures all recorded chunks

@@ -28,49 +28,7 @@
     <title>Pro Screen Recorder</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="#"
-              >Home <span class="sr-only">(current)</span></a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Features</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Pricing</a>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link disabled"
-              href="#"
-              tabindex="-1"
-              aria-disabled="true"
-              >Disabled</a
-            >
-          </li>
-        </ul>
-      </div>
-    </nav>
-
-    <div id="id1">
-      <button id="startBtn">Record</button>
-      <button id="stopBtn">Stop</button>
-    </div>
+    <div id="id1"></div>
     <div class="container pt-3">
       <div class="row justify-content-center">
         <div class="dropdown">
@@ -85,29 +43,43 @@
           >
             Audio input
           </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a
+          <div
+            class="dropdown-menu"
+            aria-labelledby="dropdownMenuButton"
+            id="dropdown-audioinput"
+          >
+            <!-- <a
               class="dropdown-item"
               href="#"
               onclick="document.getElementById('dropdownMenuButton').innerText='item 1'"
               >Action
-            </a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
+            </a> -->
           </div>
         </div>
       </div>
-    </div>
-    <div class="container pt-3">
-      <div class="progress" style="height: 10px;">
-        <div
-          class="progress-bar"
-          role="progressbar"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          style="width: 50%;"
-          id="progress-1"
-        ></div>
+
+      <div class="row pt-4">
+        <div class="col">
+          <div class="progress" style="height: 10px;">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              id="progress-1"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center pt-4">
+        <button
+          type="button"
+          class="btn btn-success"
+          id="startBtn"
+          style="width: 250px;"
+        >
+          Start Recording
+        </button>
       </div>
     </div>
 
