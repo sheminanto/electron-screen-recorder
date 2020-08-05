@@ -106,23 +106,6 @@ _audioSources.then(async (sources) => {
           console.log("false");
         }
       });
-
-    // let state = false;
-    // let _dropDownitem = document.createElement("a");
-    // _dropDownitem.className = "dropdown-item ";
-    // _dropDownitem.addEventListener("click", (e) => {
-    //   if (state == false) {
-    //     _dropDownitem.classList.add("active");
-    //     state = true;
-    //   } else {
-    //     _dropDownitem.classList.remove("active");
-    //     state = false;
-    //   }
-    // });
-    // _dropDownitem.href = "#";
-    // _dropDownitem.innerText = source.label;
-    // _dropDownAudioInput.appendChild(_dropDownitem);
-    // console.log(source);
   }
 });
 
@@ -151,12 +134,6 @@ async function setAudio(source) {
   // });
   // console.log(audiostream1.getAudioTracks()[0].getSettings());
   // console.log(audiostream2.getAudioTracks()[0].getSettings());
-  audiostream1.getTracks().forEach(
-    (item) =>
-      (item.onended = function () {
-        console.log("audio stream ended " + source.label);
-      })
-  );
 
   let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
   // let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
@@ -211,18 +188,10 @@ function setScreen() {
           // stream.addTrack((await setAudio()).getTracks()[0]);
           // console.log(stream.getAudioTracks()[0].getSettings());
 
-          audstream = await setAudio();
-          stream.addTrack(audstream.getAudioTracks()[0]);
+          // audstream = await setAudio();
+          // audstream = dest.stream;
+          // stream.addTrack(audstream.getAudioTracks()[0]);
 
-          let progressBAr = document.getElementById("progress-1");
-
-          let audioMonitor = new Hark(audstream, {
-            interval: 110,
-            threshold: -120,
-          });
-          audioMonitor.on("volume_change", (volume) => {
-            progressBAr.style.width = `${volume + 120}%`;
-          });
           // stream.getTracks().forEach((track) => track.stop());
 
           writeStream(stream);
@@ -235,7 +204,7 @@ function setScreen() {
       }
     });
 }
-// setScreen();
+setScreen();
 
 async function handleStream(stream) {
   let video = document.createElement("video");
@@ -280,6 +249,7 @@ async function writeStream(stream) {
     // audioBitsPerSecond: 92000,
     // videoBitsPerSecond: 1000000,
   };
+
   mediaRecorder = new MediaRecorder(stream, options);
 
   mediaRecorder.ondataavailable = handleDataAvailable;
@@ -288,6 +258,7 @@ async function writeStream(stream) {
   const startBtn = document.getElementById("startBtn");
   startBtn.onclick = (e) => {
     if (_recordingState == false) {
+      stream.addTrack(dest.stream.getAudioTracks()[0]);
       filePath = "./recorded/";
       fileName = "data.webm";
       fileExt = ".webm";
