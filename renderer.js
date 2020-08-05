@@ -19,12 +19,13 @@ let mediaRecorder;
 let audioContext = new AudioContext();
 let dest = audioContext.createMediaStreamDestination();
 let audiodevices;
-let streamsav;
+
 let _screenWidth = 1980;
 let _screenHeight = 1080;
 let _recordingState = false;
 let audstream;
 let _audioSources;
+let _audioDevicesCount = 0;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -45,6 +46,7 @@ _audioSources.then(async (sources) => {
   let _meterSection = document.getElementById("audio-meter-section");
 
   for (const source of sources) {
+    let _audioLevel;
     let stream;
     let audioMonitor;
     let _audioMeter = document.createElement("div");
@@ -81,6 +83,7 @@ _audioSources.then(async (sources) => {
       .getElementById(source.deviceId)
       .addEventListener("change", (change) => {
         if (change.target.checked) {
+          _audioDevicesCount += 1;
           _meterSection.appendChild(_audioMeter);
           progressBAr = document.getElementById(
             `audio-meter-${source.deviceId}`
@@ -89,21 +92,31 @@ _audioSources.then(async (sources) => {
             stream = res;
             audioMonitor = new Hark(res.mediaStream, {
               interval: 110,
-              threshold: -120,
             });
+
             audioMonitor.on("volume_change", (volume) => {
-              progressBAr.style.width = `${volume + 120}%`;
+              _audioLevel = volume * 0.85 + 100;
+              progressBAr.style.width = `${_audioLevel}%`;
+              if (_audioLevel <= 0) {
+                progressBAr.style.width = "0%";
+              }
             });
+
             console.log(res.mediaStream.getAudioTracks()[0].readyState);
           });
           console.log("true");
         } else {
+          _audioDevicesCount -= 1;
+          stream.disconnect(dest);
           _audioMeter.remove();
           audioMonitor.stop();
           stream.mediaStream.getTracks().forEach((item) => item.stop());
           console.log(stream.mediaStream.getAudioTracks()[0].readyState);
           progressBAr.style.width = "0%";
           console.log("false");
+          stream = null;
+          progressBAr = null;
+          audioMonitor = null;
         }
       });
   }
@@ -238,11 +251,12 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
 }
 
 async function writeStream(stream) {
+  let streamsav;
   let filePath;
   let fileName;
   let fileExt;
-  let blob;
-  let buffer;
+
+  const startBtn = document.getElementById("startBtn");
 
   let options = {
     mimeType: "video/webm; codecs=vp9,opus",
@@ -254,34 +268,43 @@ async function writeStream(stream) {
 
   mediaRecorder.ondataavailable = handleDataAvailable;
   mediaRecorder.onstop = handleStop;
+  mediaRecorder.onstart = () => {
+    startBtn.className = "btn btn-danger";
+    startBtn.innerText = "Stop Recording";
+    _recordingState = true;
+  };
 
-  const startBtn = document.getElementById("startBtn");
   startBtn.onclick = (e) => {
     if (_recordingState == false) {
-      stream.addTrack(dest.stream.getAudioTracks()[0]);
+      if (_audioDevicesCount != 0) {
+        stream.addTrack(dest.stream.getAudioTracks()[0]);
+      } else {
+        stream.getAudioTracks().forEach((track) => stream.removeTrack(track));
+      }
       filePath = "./recorded/";
       fileName = "data.webm";
       fileExt = ".webm";
       fileName = fileCheck(filePath, fileName, fileExt, 0);
       streamsav = fs.createWriteStream(filePath + fileName + fileExt);
-      mediaRecorder.start(1000);
-      startBtn.className = "btn btn-danger";
-      startBtn.innerText = "Stop Recording";
-      _recordingState = true;
+
+      try {
+        mediaRecorder.start(1000);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       try {
         mediaRecorder.stop();
       } catch (error) {
         console.log(error);
       }
-      startBtn.className = "btn btn-success";
-      startBtn.innerText = "Start Recording";
-      _recordingState = false;
     }
   };
 
   // Captures all recorded chunks
   async function handleDataAvailable(e) {
+    let blob;
+    let buffer;
     console.log("video data available");
     recordedChunks.push(e.data);
     blob = new Blob(recordedChunks, {
@@ -290,10 +313,15 @@ async function writeStream(stream) {
 
     buffer = Buffer.from(await blob.arrayBuffer());
     streamsav.write(buffer);
+
     recordedChunks = [];
   }
 
   async function handleStop(e) {
+    startBtn.className = "btn btn-success";
+    startBtn.innerText = "Start Recording";
+    _recordingState = false;
+
     // stream.getTracks().forEach((track) => {
     //   track.stop();
     // });
