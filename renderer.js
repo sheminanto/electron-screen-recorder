@@ -129,9 +129,6 @@ async function setAudio(source) {
       deviceId: source.deviceId,
       autoGainControl: false,
       latency: 0.0,
-      noiseSuppression: true,
-      channelCount: 2,
-      sampleSize: 16,
     },
   });
 
@@ -255,6 +252,8 @@ async function writeStream(stream) {
   let filePath;
   let fileName;
   let fileExt;
+  let blob;
+  let buffer;
 
   const startBtn = document.getElementById("startBtn");
 
@@ -313,7 +312,7 @@ async function writeStream(stream) {
       streamsav = fs.createWriteStream(filePath + fileName + fileExt);
 
       try {
-        mediaRecorder.start(1000);
+        mediaRecorder.start(100);
       } catch (error) {
         console.log(error);
       }
@@ -328,8 +327,6 @@ async function writeStream(stream) {
 
   // Captures all recorded chunks
   async function handleDataAvailable(e) {
-    let blob;
-    let buffer;
     console.log("video data available");
     recordedChunks.push(e.data);
     blob = new Blob(recordedChunks, {
