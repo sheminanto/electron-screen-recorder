@@ -26,6 +26,7 @@ let _recordingState = false;
 let audstream;
 let _audioSources;
 let _audioDevicesCount = 0;
+let streamsav;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -96,12 +97,12 @@ _audioSources.then(async (sources) => {
 
             audioMonitor.on("volume_change", (volume) => {
               _audioLevel = volume * 0.85 + 100;
-              progressBAr.style.width = `${_audioLevel}%`;
               if (_audioLevel <= 0) {
                 progressBAr.style.width = "0%";
+              } else {
+                progressBAr.style.width = `${_audioLevel}%`;
               }
             });
-
             console.log(res.mediaStream.getAudioTracks()[0].readyState);
           });
           console.log("true");
@@ -207,7 +208,7 @@ function setScreen() {
 
           // stream.getTracks().forEach((track) => track.stop());
 
-          writeStream(stream);
+          await writeStream(stream);
           // handleStream(stream);
         } catch (e) {
           handleError(e);
@@ -251,7 +252,6 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
 }
 
 async function writeStream(stream) {
-  let streamsav;
   let filePath;
   let fileName;
   let fileExt;
@@ -272,7 +272,32 @@ async function writeStream(stream) {
     startBtn.className = "btn btn-danger";
     startBtn.innerText = "Stop Recording";
     _recordingState = true;
+    console.log("started recording ->" + _recordingState);
   };
+
+  function handleStop() {
+    startBtn.className = "btn btn-success";
+    startBtn.innerText = "Start Recording";
+    _recordingState = false;
+
+    // stream.getTracks().forEach((track) => {
+    //   track.stop();
+    // });
+
+    // const blob = new Blob(recordedChunks, {
+    //   type: "video/webm; codecs=vp9",
+    // });
+
+    // const buffer = Buffer.from(await blob.arrayBuffer());
+
+    // const filePath = "./test3.webm";
+
+    // console.log(filePath);
+
+    // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
+
+    console.log("hello finished");
+  }
 
   startBtn.onclick = (e) => {
     if (_recordingState == false) {
@@ -315,30 +340,6 @@ async function writeStream(stream) {
     streamsav.write(buffer);
 
     recordedChunks = [];
-  }
-
-  async function handleStop(e) {
-    startBtn.className = "btn btn-success";
-    startBtn.innerText = "Start Recording";
-    _recordingState = false;
-
-    // stream.getTracks().forEach((track) => {
-    //   track.stop();
-    // });
-
-    // const blob = new Blob(recordedChunks, {
-    //   type: "video/webm; codecs=vp9",
-    // });
-
-    // const buffer = Buffer.from(await blob.arrayBuffer());
-
-    // const filePath = "./test3.webm";
-
-    // console.log(filePath);
-
-    // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-
-    console.log("hello finished");
   }
 }
 
