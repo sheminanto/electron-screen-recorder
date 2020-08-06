@@ -10,9 +10,9 @@ let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
 
-// let ffmpeg = require("fluent-ffmpeg");
-// ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
-// ffmpeg.setFfprobePath("./win-ffmpeg/bin");
+let ffmpeg = require("fluent-ffmpeg");
+ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
+ffmpeg.setFfprobePath("./win-ffmpeg/bin");
 
 let recordedChunks = [];
 let mediaRecorder;
@@ -296,6 +296,21 @@ async function writeStream(stream) {
     // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
 
     console.log("hello finished");
+
+    ffmpeg(filePath + fileName + fileExt)
+      .videoCodec("libx264")
+      .audioCodec("aac")
+      .format("mp4")
+      .save(filePath + fileName + "-converted.mp4")
+      .on("error", function (err) {
+        console.log("An error occurred: " + err.message);
+      })
+      .on("end", function () {
+        console.log("Processing finished !");
+      })
+      .on("progress", function (progress) {
+        console.log(progress);
+      });
   }
 
   startBtn.onclick = (e) => {
