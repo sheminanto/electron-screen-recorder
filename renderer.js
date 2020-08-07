@@ -11,8 +11,15 @@ let fs = require("fs");
 let Hark = require("hark");
 
 let ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath("./win-ffmpeg/bin/ffmpeg.exe");
-ffmpeg.setFfprobePath("./win-ffmpeg/bin");
+
+ffmpeg.setFfmpegPath("./resources/app/win-ffmpeg/bin/ffmpeg.exe");
+ffmpeg.setFfprobePath("./resources/win-ffmpeg/bin/ffprobe.exe");
+ffmpeg.getAvailableCodecs((err, codecs) => {
+  if (err) {
+    ffmpeg.setFfmpegPath("win-ffmpeg/bin/ffmpeg.exe");
+    ffmpeg.setFfprobePath("win-ffmpeg/bin/ffprobe.exe");
+  }
+});
 
 let recordedChunks = [];
 let mediaRecorder;
@@ -153,7 +160,6 @@ async function setAudio(source) {
   // audioIn_02.connect(dest);
 
   return audioIn_01;
-
   // return dest.stream;
 }
 
