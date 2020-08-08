@@ -34,6 +34,7 @@ let audstream;
 let _audioSources;
 let _audioDevicesCount = 0;
 let streamsav;
+const startBtn = document.getElementById("startBtn");
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -46,7 +47,21 @@ async function getAudioSources() {
     return audiodevices;
   });
 }
+async function setAudio(source) {
+  const audiostream1 = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId: source.deviceId,
+      autoGainControl: false,
+      latency: 0.0,
+    },
+  });
 
+  let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
+
+  audioIn_01.connect(dest);
+
+  return audioIn_01;
+}
 _audioSources = getAudioSources();
 
 _audioSources.then(async (sources) => {
@@ -130,39 +145,6 @@ _audioSources.then(async (sources) => {
   }
 });
 
-async function setAudio(source) {
-  const audiostream1 = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      deviceId: source.deviceId,
-      autoGainControl: false,
-      latency: 0.0,
-    },
-  });
-
-  // const audiostream2 = await navigator.mediaDevices.getUserMedia({
-  //   audio: {
-  //     deviceId:
-  //       "ef454260e26728a3175e9b04546e19d73c0f59a0a57c6076fc42ac33bde4d760",
-  //     autoGainControl: false,
-  //     latency: 0.0,
-  //     noiseSuppression: true,
-  //     channelCount: 2,
-  //     sampleSize: 16,
-  //   },
-  // });
-  // console.log(audiostream1.getAudioTracks()[0].getSettings());
-  // console.log(audiostream2.getAudioTracks()[0].getSettings());
-
-  let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
-  // let audioIn_02 = audioContext.createMediaStreamSource(audiostream2);
-
-  audioIn_01.connect(dest);
-  // audioIn_02.connect(dest);
-
-  return audioIn_01;
-  // return dest.stream;
-}
-
 async function getScreenSources() {
   return await desktopCapturer.getSources({
     types: ["window", "screen"],
@@ -177,8 +159,8 @@ async function getScreenSources() {
 //   }
 // });
 
-function setScreen() {
-  desktopCapturer
+async function setScreen() {
+  return await desktopCapturer
     .getSources({ types: ["window", "screen"] })
     .then(async (sources) => {
       for (const source of sources) {
@@ -210,6 +192,7 @@ function setScreen() {
           // stream.addTrack(audstream.getAudioTracks()[0]);
 
           // stream.getTracks().forEach((track) => track.stop());
+          return stream;
 
           await writeStream(stream);
           // handleStream(stream);
@@ -221,7 +204,13 @@ function setScreen() {
       }
     });
 }
-setScreen();
+// setScreen();
+
+startBtn.onclick = () => {
+  let videoStream = setScreen();
+  videoStream.then((stream) => console.log(stream));
+  console.log("hello");
+};
 
 async function handleStream(stream) {
   let video = document.createElement("video");
