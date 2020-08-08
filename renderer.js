@@ -43,6 +43,8 @@ let streamsav;
 let filePath;
 let fileName;
 let fileExt;
+let blob;
+let buffer;
 
 let _converToMp4 = false;
 const startBtn = document.getElementById("startBtn");
@@ -251,16 +253,19 @@ function handleStart() {
 async function handleDataAvailable(e) {
   console.log("video data available");
   recordedChunks.push(e.data);
-  const blob = new Blob(recordedChunks, {
+  blob = new Blob(recordedChunks, {
     type: "video/webm; codecs=vp9 ",
   });
-  const buffer = Buffer.from(await blob.arrayBuffer());
-  streamsav.write(buffer);
+  buffer = Buffer.from(await blob.arrayBuffer());
+  await streamsav.write(buffer);
   recordedChunks = [];
+  blob = null;
+  buffer = null;
 }
 
 async function handleStop(stream) {
   stream.getVideoTracks().forEach((track) => track.stop());
+
   startBtn.className = "btn btn-success";
   startBtn.innerText = "Start Recording";
   _recordingState = false;
@@ -342,4 +347,11 @@ saveBtn.addEventListener("click", (e) => {
     .catch((err) => {
       console.log(err);
     });
+});
+const { webFrame } = require("electron");
+document.addEventListener("keydown", (e) => {
+  if (e.key == "c") {
+    webFrame.clearCache();
+    console.log("CLEARED");
+  }
 });
