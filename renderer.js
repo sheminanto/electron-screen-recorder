@@ -85,7 +85,7 @@ _audioSources.then(async (sources) => {
     const _audioMeter = document.createElement("div");
     const _dropDownitem = document.createElement("a");
     let progressBAr;
-    _audioMeter.className = `row pt-4 `;
+    _audioMeter.className = `row  pt-1 `;
     _audioMeter.innerHTML = ` <div class="col">
       <div class="progress" style="height: 10px;">
         <div
@@ -95,7 +95,7 @@ _audioSources.then(async (sources) => {
           aria-valuemax="100"
           id="audio-meter-${source.deviceId}"
         ></div>
-      </div>
+      </div><small>${source.label}</small>
     </div>`;
 
     _dropDownitem.className = "dropdown-item ";
