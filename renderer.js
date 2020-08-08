@@ -6,11 +6,16 @@
 // process.
 
 const { desktopCapturer } = require("electron");
+const saveBtn = document.getElementById("save-dialog");
+let remote = require("electron").remote;
+const { dialog } = require("electron").remote;
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
 
 let ffmpeg = require("fluent-ffmpeg");
+const { time } = require("console");
+const { title } = require("process");
 
 ffmpeg.setFfmpegPath("./resources/app/win-ffmpeg/bin/ffmpeg.exe");
 ffmpeg.setFfprobePath("./resources/win-ffmpeg/bin/ffprobe.exe");
@@ -292,20 +297,20 @@ async function writeStream(stream) {
 
     console.log("hello finished");
 
-    ffmpeg(filePath + fileName + fileExt)
-      .videoCodec("libx264")
-      .audioCodec("aac")
-      .format("mp4")
-      .save(filePath + fileName + "-converted.mp4")
-      .on("error", function (err) {
-        console.log("An error occurred: " + err.message);
-      })
-      .on("end", function () {
-        console.log("Processing finished !");
-      })
-      .on("progress", function (progress) {
-        console.log(progress);
-      });
+    // ffmpeg(filePath + fileName + fileExt)
+    //   .videoCodec("libx264")
+    //   .audioCodec("aac")
+    //   .format("mp4")
+    //   .save(filePath + fileName + "-converted.mp4")
+    //   .on("error", function (err) {
+    //     console.log("An error occurred: " + err.message);
+    //   })
+    //   .on("end", function () {
+    //     console.log("Processing finished !");
+    //   })
+    //   .on("progress", function (progress) {
+    //     console.log(progress);
+    //   });
   }
 
   startBtn.onclick = (e) => {
@@ -353,3 +358,36 @@ async function writeStream(stream) {
 function handleError(e) {
   console.log(e);
 }
+
+//SaveDialog
+
+saveBtn.addEventListener("click", (e) => {
+  dialog
+    .showSaveDialog({
+      title: "Save Recording",
+      filters: [
+        {
+          name: "Text Files",
+          extensions: ["txt"],
+        },
+      ],
+      // properties: [],
+    })
+    .then((file) => {
+      console.log(file.canceled);
+      if (!file.canceled) {
+        console.log(file.filePath.toString());
+        fs.writeFile(
+          file.filePath.toString(),
+          "This is a Sample File",
+          function (err) {
+            if (err) throw err;
+            console.log("Saved!");
+          }
+        );
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
