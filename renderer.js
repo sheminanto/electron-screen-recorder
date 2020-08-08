@@ -17,6 +17,7 @@ let ffmpeg = require("fluent-ffmpeg");
 const { time } = require("console");
 const { title } = require("process");
 
+// setting the path of ffmpeg in development and production versions
 ffmpeg.setFfmpegPath("./resources/app/win-ffmpeg/bin/ffmpeg.exe");
 ffmpeg.setFfprobePath("./resources/win-ffmpeg/bin/ffprobe.exe");
 ffmpeg.getAvailableCodecs((err, codecs) => {
@@ -39,6 +40,9 @@ let audstream;
 let _audioSources;
 let _audioDevicesCount = 0;
 let streamsav;
+let filePath;
+let fileName;
+let fileExt;
 const startBtn = document.getElementById("startBtn");
 
 async function getAudioSources() {
@@ -249,9 +253,6 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
 }
 
 async function writeStream(stream) {
-  let filePath;
-  let fileName;
-  let fileExt;
   let blob;
   let buffer;
 
