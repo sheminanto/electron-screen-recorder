@@ -43,7 +43,11 @@ let streamsav;
 let filePath;
 let fileName;
 let fileExt;
+let blob;
+let buffer;
+let _converToMp4 = false;
 const startBtn = document.getElementById("startBtn");
+const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -64,25 +68,21 @@ async function setAudio(source) {
       latency: 0.0,
     },
   });
-
   let audioIn_01 = audioContext.createMediaStreamSource(audiostream1);
-
   audioIn_01.connect(dest);
-
   return audioIn_01;
 }
 _audioSources = getAudioSources();
 
 _audioSources.then(async (sources) => {
-  let _dropDownAudioInput = document.getElementById("dropdown-audioinput");
-  let _meterSection = document.getElementById("audio-meter-section");
+  const _meterSection = document.getElementById("audio-meter-section");
 
   for (const source of sources) {
     let _audioLevel;
     let stream;
     let audioMonitor;
-    let _audioMeter = document.createElement("div");
-    let _dropDownitem = document.createElement("a");
+    const _audioMeter = document.createElement("div");
+    const _dropDownitem = document.createElement("a");
     let progressBAr;
     _audioMeter.className = `row pt-4 `;
     _audioMeter.innerHTML = ` <div class="col">
@@ -159,6 +159,7 @@ async function getScreenSources() {
     types: ["window", "screen"],
   });
 }
+let _screenSources = getScreenSources();
 
 // getScreenSources().then((sources) => {
 //   for (const source of sources) {
@@ -168,58 +169,122 @@ async function getScreenSources() {
 //   }
 // });
 
-async function setScreen() {
-  return await desktopCapturer
-    .getSources({ types: ["window", "screen"] })
-    .then(async (sources) => {
-      for (const source of sources) {
-        console.log(source.name);
-        // if (source.name === "Entire Screen") {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-              mandatory: {
-                chromeMediaSource: "desktop",
-                chromeMediaSourceId: source.id,
-                minWidth: 640,
-                maxWidth: _screenWidth,
-                minHeight: 480,
-                maxHeight: _screenHeight,
-              },
-            },
-          });
-
-          stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
-          // console.log(stream.getVideoTracks()[0].getSettings());
-
-          // stream.addTrack((await setAudio()).getTracks()[0]);
-          // console.log(stream.getAudioTracks()[0].getSettings());
-
-          // audstream = await setAudio();
-          // audstream = dest.stream;
-          // stream.addTrack(audstream.getAudioTracks()[0]);
-
-          // stream.getTracks().forEach((track) => track.stop());
-          return stream;
-
-          await writeStream(stream);
-          // handleStream(stream);
-        } catch (e) {
-          handleError(e);
-        }
-        return;
-        // }
-      }
+async function setScreen(sourceid) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: sourceid,
+          minWidth: 640,
+          maxWidth: _screenWidth,
+          minHeight: 480,
+          maxHeight: _screenHeight,
+        },
+      },
     });
+
+    stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
+    // console.log(stream.getVideoTracks()[0].getSettings());
+
+    // stream.addTrack((await setAudio()).getTracks()[0]);
+    // console.log(stream.getAudioTracks()[0].getSettings());
+
+    // audstream = await setAudio();
+    // audstream = dest.stream;
+    // stream.addTrack(audstream.getAudioTracks()[0]);
+
+    // stream.getTracks().forEach((track) => track.stop());
+
+    return stream;
+    // await writeStream(stream);
+
+    // handleStream(stream);
+  } catch (e) {
+    handleError(e);
+  }
 }
-// setScreen();
+// setScreen("screen:0:0");
 
 startBtn.onclick = () => {
-  let videoStream = setScreen();
-  videoStream.then((stream) => console.log(stream));
-  console.log("hello");
+  if (_recordingState == false) {
+    let videoStream = setScreen("screen:0:0");
+    filePath = "./recorded/";
+    fileName = "data.webm";
+    fileExt = ".webm";
+    fileName = fileCheck(filePath, fileName, fileExt, 0);
+    streamsav = fs.createWriteStream(filePath + fileName + fileExt);
+    videoStream.then((stream) => {
+      if (_audioDevicesCount != 0) {
+        stream.addTrack(dest.stream.getAudioTracks()[0]);
+      }
+      let options = {
+        mimeType: "video/webm; codecs=vp9,opus",
+        // audioBitsPerSecond: 92000,
+        // videoBitsPerSecond: 1000000,
+      };
+      mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorder.onstart = handleStart;
+      mediaRecorder.ondataavailable = handleDataAvailable;
+      mediaRecorder.onstop = () => handleStop(stream);
+      try {
+        mediaRecorder.start(100);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  } else {
+    try {
+      mediaRecorder.stop();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
+function handleStart() {
+  startBtn.className = "btn btn-danger";
+  startBtn.innerText = "Stop Recording";
+  _recordingState = true;
+  console.log("started recording ->" + _recordingState);
+}
+
+async function handleDataAvailable(e) {
+  console.log("video data available");
+  recordedChunks.push(e.data);
+  blob = new Blob(recordedChunks, {
+    type: "video/webm; codecs=vp9 ",
+  });
+
+  buffer = Buffer.from(await blob.arrayBuffer());
+  streamsav.write(buffer);
+  recordedChunks = [];
+}
+
+async function handleStop(stream) {
+  stream.getVideoTracks().forEach((track) => track.stop());
+  startBtn.className = "btn btn-success";
+  startBtn.innerText = "Start Recording";
+  _recordingState = false;
+  if (_converToMp4 == true) await _convert();
+}
+
+async function _convert() {
+  ffmpeg(filePath + fileName + fileExt)
+    .videoCodec("libx264")
+    .audioCodec("aac")
+    .format("mp4")
+    .save(filePath + fileName + "-converted.mp4")
+    .on("error", function (err) {
+      console.log("An error occurred: " + err.message);
+    })
+    .on("end", function () {
+      console.log("Processing finished !");
+    })
+    .on("progress", function (progress) {
+      console.log(progress);
+    });
+}
 
 async function handleStream(stream) {
   let video = document.createElement("video");
@@ -259,7 +324,7 @@ async function writeStream(stream) {
   const startBtn = document.getElementById("startBtn");
 
   let options = {
-    mimeType: "video/webm; codecs=vp9,opus",
+    mimeType: "video/webm; codecs=vp9",
     // audioBitsPerSecond: 92000,
     // videoBitsPerSecond: 1000000,
   };
@@ -346,7 +411,7 @@ async function writeStream(stream) {
     console.log("video data available");
     recordedChunks.push(e.data);
     blob = new Blob(recordedChunks, {
-      type: "video/webm; codecs=vp9 ",
+      type: "video/webm; codecs=vp9",
     });
 
     buffer = Buffer.from(await blob.arrayBuffer());
@@ -378,14 +443,6 @@ saveBtn.addEventListener("click", (e) => {
       console.log(file.canceled);
       if (!file.canceled) {
         console.log(file.filePath.toString());
-        fs.writeFile(
-          file.filePath.toString(),
-          "This is a Sample File",
-          function (err) {
-            if (err) throw err;
-            console.log("Saved!");
-          }
-        );
       }
     })
     .catch((err) => {
