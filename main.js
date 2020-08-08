@@ -13,6 +13,7 @@ function createWindow() {
     height: 500,
 
     webPreferences: {
+      // devTools: false,
       nodeIntegration: true,
       //   preload: path.join(__dirname, "renderer.js"),
     },

@@ -87,7 +87,7 @@ _audioSources.then(async (sources) => {
     let progressBAr;
     _audioMeter.className = `row  pt-1 `;
     _audioMeter.innerHTML = ` <div class="col">
-      <div class="progress" style="height: 10px;">
+      <div class="progress" style="height: 8px;">
         <div
           class="progress-bar"
           role="progressbar"
@@ -107,7 +107,7 @@ _audioSources.then(async (sources) => {
         id="${source.deviceId}"
       />
       <label class="custom-control-label" for="${source.deviceId}">
-        ${source.label}
+      <small>  ${source.label}</small>
       </label>
     </div>
   </form>`;
@@ -187,16 +187,6 @@ async function setScreen(sourceid) {
     });
 
     stream.getVideoTracks()[0].applyConstraints({ frameRate: 30 });
-    // console.log(stream.getVideoTracks()[0].getSettings());
-
-    // stream.addTrack((await setAudio()).getTracks()[0]);
-    // console.log(stream.getAudioTracks()[0].getSettings());
-
-    // audstream = await setAudio();
-    // audstream = dest.stream;
-    // stream.addTrack(audstream.getAudioTracks()[0]);
-
-    // stream.getTracks().forEach((track) => track.stop());
 
     return stream;
     // await writeStream(stream);
@@ -221,7 +211,7 @@ startBtn.onclick = () => {
         stream.addTrack(dest.stream.getAudioTracks()[0]);
       }
       let options = {
-        mimeType: "video/webm; codecs=vp9,opus",
+        mimeType: "video/webm; codecs=vp9",
         // audioBitsPerSecond: 92000,
         // videoBitsPerSecond: 1000000,
       };
@@ -254,13 +244,11 @@ async function handleDataAvailable(e) {
   console.log("video data available");
   recordedChunks.push(e.data);
   blob = new Blob(recordedChunks, {
-    type: "video/webm; codecs=vp9 ",
+    // type: "video/webm; codecs=vp9 ",
   });
   buffer = Buffer.from(await blob.arrayBuffer());
   await streamsav.write(buffer);
   recordedChunks = [];
-  blob = null;
-  buffer = null;
 }
 
 async function handleStop(stream) {
@@ -273,20 +261,24 @@ async function handleStop(stream) {
 }
 
 async function _convert() {
-  ffmpeg(filePath + fileName + fileExt)
-    .videoCodec("libx264")
-    .audioCodec("aac")
-    .format("mp4")
-    .save(filePath + fileName + "-converted.mp4")
-    .on("error", function (err) {
-      console.log("An error occurred: " + err.message);
-    })
-    .on("end", function () {
-      console.log("Processing finished !");
-    })
-    .on("progress", function (progress) {
-      console.log(progress);
-    });
+  try {
+    ffmpeg(filePath + fileName + fileExt)
+      .videoCodec("libx264")
+      .audioCodec("aac")
+      .format("mp4")
+      .save(filePath + fileName + "-converted.mp4")
+      .on("error", function (err) {
+        console.log("An error occurred: " + err.message);
+      })
+      .on("end", function () {
+        console.log("Processing finished !");
+      })
+      .on("progress", function (progress) {
+        console.log(progress);
+      });
+  } catch (error) {
+    console.log("ffmpeg error : " + error);
+  }
 }
 
 async function handleStream(stream) {
