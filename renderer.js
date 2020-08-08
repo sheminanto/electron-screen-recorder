@@ -43,8 +43,7 @@ let streamsav;
 let filePath;
 let fileName;
 let fileExt;
-let blob;
-let buffer;
+
 let _converToMp4 = false;
 const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
@@ -252,11 +251,10 @@ function handleStart() {
 async function handleDataAvailable(e) {
   console.log("video data available");
   recordedChunks.push(e.data);
-  blob = new Blob(recordedChunks, {
+  const blob = new Blob(recordedChunks, {
     type: "video/webm; codecs=vp9 ",
   });
-
-  buffer = Buffer.from(await blob.arrayBuffer());
+  const buffer = Buffer.from(await blob.arrayBuffer());
   streamsav.write(buffer);
   recordedChunks = [];
 }
@@ -314,110 +312,6 @@ function fileCheck(filePath, fileName, fileExt, _fileCount) {
     }
   } catch (err) {
     console.log(err);
-  }
-}
-
-async function writeStream(stream) {
-  let blob;
-  let buffer;
-
-  const startBtn = document.getElementById("startBtn");
-
-  let options = {
-    mimeType: "video/webm; codecs=vp9",
-    // audioBitsPerSecond: 92000,
-    // videoBitsPerSecond: 1000000,
-  };
-
-  mediaRecorder = new MediaRecorder(stream, options);
-
-  mediaRecorder.ondataavailable = handleDataAvailable;
-  mediaRecorder.onstop = handleStop;
-  mediaRecorder.onstart = () => {
-    startBtn.className = "btn btn-danger";
-    startBtn.innerText = "Stop Recording";
-    _recordingState = true;
-    console.log("started recording ->" + _recordingState);
-  };
-
-  function handleStop() {
-    startBtn.className = "btn btn-success";
-    startBtn.innerText = "Start Recording";
-    _recordingState = false;
-
-    // stream.getTracks().forEach((track) => {
-    //   track.stop();
-    // });
-
-    // const blob = new Blob(recordedChunks, {
-    //   type: "video/webm; codecs=vp9",
-    // });
-
-    // const buffer = Buffer.from(await blob.arrayBuffer());
-
-    // const filePath = "./test3.webm";
-
-    // console.log(filePath);
-
-    // writeFile(filePath, buffer, () => console.log("video saved successfully!"));
-
-    console.log("hello finished");
-
-    // ffmpeg(filePath + fileName + fileExt)
-    //   .videoCodec("libx264")
-    //   .audioCodec("aac")
-    //   .format("mp4")
-    //   .save(filePath + fileName + "-converted.mp4")
-    //   .on("error", function (err) {
-    //     console.log("An error occurred: " + err.message);
-    //   })
-    //   .on("end", function () {
-    //     console.log("Processing finished !");
-    //   })
-    //   .on("progress", function (progress) {
-    //     console.log(progress);
-    //   });
-  }
-
-  startBtn.onclick = (e) => {
-    if (_recordingState == false) {
-      if (_audioDevicesCount != 0) {
-        stream.addTrack(dest.stream.getAudioTracks()[0]);
-      } else {
-        stream.getAudioTracks().forEach((track) => stream.removeTrack(track));
-      }
-      filePath = "./recorded/";
-      fileName = "data.webm";
-      fileExt = ".webm";
-      fileName = fileCheck(filePath, fileName, fileExt, 0);
-      streamsav = fs.createWriteStream(filePath + fileName + fileExt);
-
-      try {
-        mediaRecorder.start(100);
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      try {
-        mediaRecorder.stop();
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
-  // Captures all recorded chunks
-  async function handleDataAvailable(e) {
-    console.log("video data available");
-    recordedChunks.push(e.data);
-    blob = new Blob(recordedChunks, {
-      type: "video/webm; codecs=vp9",
-    });
-
-    buffer = Buffer.from(await blob.arrayBuffer());
-    streamsav.write(buffer);
-
-    recordedChunks = [];
   }
 }
 
