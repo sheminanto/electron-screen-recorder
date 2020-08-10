@@ -5,6 +5,8 @@ const { app, BrowserWindow } = require("electron");
 // app.commandLine.appendSwitch("disable-frame-rate-limit");
 
 const path = require("path");
+// const { ipcMain, dialog } = require("electron");
+// const selectScreen = document.getElementById("selectScreen");
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -49,3 +51,28 @@ app.on("window-all-closed", function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+//Select Screen
+
+// selectScreen.addEventListener("click", (event) => {
+//   let win = new BrowserWindow({ width: 400, height: 320 });
+
+//   win.on("close", () => {
+//     win = null;
+//   });
+//   win.loadURL("./test.html");
+//   win.show();
+// });
+
+//Save Dialog
+
+// ipcMain.on("save-dialog", (event) => {
+//   const options = {
+//     title: "Select Destination FOlder",
+//     filters: [{ name: "Movies", extensions: ["webm"] }],
+//   };
+//   dialog.showSaveDialog(options, (filename) => {
+//     event.sender.send("saved-file", filename);
+
+//   });
+// });

@@ -15,6 +15,12 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+      integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+      crossorigin="anonymous"
+    />
 
     <link
       rel="stylesheet"
@@ -28,7 +34,42 @@
     <title>Simple Screen</title>
   </head>
   <body>
-    <div id="id1"></div>
+    <div class="container pt-2">
+      <div class="row justify-content-between mx-1" style="width: 300;">
+        <div class="btn-group">
+          <button class="btn btn-sm btn-light form-check">
+            <label class="form-check-label active">
+                <input type="radio" checked="" name="res720p" id="res720"> 720p              
+            </label>
+          </button>
+          <button type="button" class="btn btn-sm btn-light form-check">
+            <label class="form-check-label">
+                <input type="radio" name="res720p" id="res720"> 1080p
+            </label>
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-info" id="selectScreen">Select screen</button>
+      </div>
+    </div>
+    <div class="container pt-2">
+      
+      <div class="row justify-content-center">
+        Destination Folder:
+        <div class="input-group input-group-sm mb-3 pt-1" style="width: 250px;">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Set destination folder"
+            id="path"
+          />
+          <div class="input-group-append">
+            <button class="btn btn-secondary" id="save-dialog">
+              <i class="fas fa-folder"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container pt-3">
       <div class="row justify-content-center pb-2">
         <div class="dropdown">
@@ -55,6 +96,7 @@
       <div class="container" id="audio-meter-section"></div>
 
       <div class="row justify-content-center pt-3">
+       
         <button
           type="button"
           class="btn btn-success"
@@ -64,12 +106,12 @@
           Start Recording
         </button>
       </div>
-      <div class="row justify-content-center pt-4">
+      <!-- <div class="row justify-content-center pt-4">
         <button type="button" class="btn btn-primary" id="save-dialog">
           Save
         </button>
       </div>
-    </div>
+    </div> -->
 
     <script>
       if (typeof module === "object") {

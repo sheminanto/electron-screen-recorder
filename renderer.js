@@ -5,7 +5,10 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { desktopCapturer } = require("electron");
+const { desktopCapturer, app } = require("electron");
+const { BrowserWindow } = require("electron").remote;
+const { ipcRenderer } = require("electron");
+const selectScreen = document.getElementById("selectScreen");
 const saveBtn = document.getElementById("save-dialog");
 let remote = require("electron").remote;
 const { dialog } = require("electron").remote;
@@ -45,6 +48,8 @@ let fileName;
 let fileExt;
 let blob;
 let buffer;
+let screenWindow = false;
+let destination = null;
 
 let _converToMp4 = false;
 const startBtn = document.getElementById("startBtn");
@@ -318,32 +323,42 @@ function handleError(e) {
 
 //SaveDialog
 
-saveBtn.addEventListener("click", (e) => {
-  dialog
-    .showSaveDialog({
+saveBtn.addEventListener("click", (event) => {
+  dialog.showOpenDialog(
+    {
       title: "Save Recording",
-      filters: [
-        {
-          name: "Text Files",
-          extensions: ["txt"],
-        },
-      ],
-      // properties: [],
-    })
-    .then((file) => {
-      console.log(file.canceled);
-      if (!file.canceled) {
-        console.log(file.filePath.toString());
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-const { webFrame } = require("electron");
-document.addEventListener("keydown", (e) => {
-  if (e.key == "c") {
-    webFrame.clearCache();
-    console.log("CLEARED");
-  }
+      // defaultPath: app.getPath("videos"),
+      buttonLabel: "Select Folder",
+      properties: ["openDirectory"],
+    },
+    (dir) => {
+      console.log(dir);
+      document.getElementById("path") = dir;
+    }
+  );
+
+  const { webFrame } = require("electron");
+  document.addEventListener("keydown", (e) => {
+    if (e.key == "c") {
+      webFrame.clearCache();
+      console.log("CLEARED");
+    }
+  });
+
+  // Select Screen
+
+  selectScreen.addEventListener("click", (event) => {
+    if (screenWindow == false) {
+      screenWindow = true;
+      let win = new BrowserWindow({ width: 400, height: 320 });
+      win.loadURL("./selectScreen.html");
+      win.show();
+      console.log(screenWindow);
+      win.on("close", () => {
+        screenWindow = false;
+        console.log(screenWindow);
+        win = null;
+      });
+    }
+  });
 });
