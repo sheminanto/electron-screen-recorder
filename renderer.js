@@ -10,7 +10,7 @@ const { BrowserWindow } = require("electron").remote;
 const { ipcRenderer } = require("electron");
 const selectScreen = document.getElementById("selectScreen");
 const saveBtn = document.getElementById("save-dialog");
-let remote = require("electron").remote;
+
 const { dialog } = require("electron").remote;
 let path = require("path");
 let fs = require("fs");
@@ -324,41 +324,43 @@ function handleError(e) {
 //SaveDialog
 
 saveBtn.addEventListener("click", (event) => {
-  dialog.showOpenDialog(
-    {
+  console.log("clicked");
+  dialog
+    .showOpenDialog({
       title: "Save Recording",
       // defaultPath: app.getPath("videos"),
       buttonLabel: "Select Folder",
       properties: ["openDirectory"],
-    },
-    (dir) => {
-      console.log(dir);
-      document.getElementById("path") = dir;
-    }
-  );
+    })
+    .then((selectedPath) => {
+      if (selectedPath) {
+        console.log(selectedPath.filePaths);
+        document.getElementById("path").value = selectedPath.filePaths;
+      }
+    });
+});
+// For testing purposes.
+const { webFrame } = require("electron");
+document.addEventListener("keydown", (e) => {
+  if (e.key == "c") {
+    webFrame.clearCache();
+    console.log("CLEARED");
+  }
+});
 
-  const { webFrame } = require("electron");
-  document.addEventListener("keydown", (e) => {
-    if (e.key == "c") {
-      webFrame.clearCache();
-      console.log("CLEARED");
-    }
-  });
+// Select Screen
 
-  // Select Screen
-
-  selectScreen.addEventListener("click", (event) => {
-    if (screenWindow == false) {
-      screenWindow = true;
-      let win = new BrowserWindow({ width: 400, height: 320 });
-      win.loadURL("./selectScreen.html");
-      win.show();
+selectScreen.addEventListener("click", (event) => {
+  if (screenWindow == false) {
+    screenWindow = true;
+    let win = new BrowserWindow({ width: 400, height: 320 });
+    win.loadURL("./selectScreen.html");
+    win.show();
+    console.log(screenWindow);
+    win.on("close", () => {
+      screenWindow = false;
       console.log(screenWindow);
-      win.on("close", () => {
-        screenWindow = false;
-        console.log(screenWindow);
-        win = null;
-      });
-    }
-  });
+      win = null;
+    });
+  }
 });
