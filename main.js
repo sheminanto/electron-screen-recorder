@@ -21,8 +21,8 @@ function createWindow() {
       //   preload: path.join(__dirname, "renderer.js"),
     },
   });
-  // mainWindow.setMenuBarVisibility(false);
-  mainWindow.removeMenu();
+  mainWindow.setMenuBarVisibility(false);
+  // mainWindow.removeMenu();
 
   // and load the index.html of the app.
   mainWindow.loadFile("./index.html");
