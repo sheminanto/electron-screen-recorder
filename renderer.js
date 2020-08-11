@@ -5,7 +5,7 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { desktopCapturer, app } = require("electron");
+const { desktopCapturer, remote } = require("electron");
 const { BrowserWindow } = require("electron").remote;
 const { ipcRenderer } = require("electron");
 const selectScreen = document.getElementById("selectScreen");
@@ -328,7 +328,7 @@ saveBtn.addEventListener("click", (event) => {
   dialog
     .showOpenDialog({
       title: "Save Recording",
-      // defaultPath: app.getPath("videos"),
+      defaultPath: remote.app.getPath("videos"),
       buttonLabel: "Select Folder",
       properties: ["openDirectory"],
     })
@@ -353,9 +353,16 @@ document.addEventListener("keydown", (e) => {
 selectScreen.addEventListener("click", (event) => {
   if (screenWindow == false) {
     screenWindow = true;
-    let win = new BrowserWindow({ width: 400, height: 320 });
-    win.loadURL("./selectScreen.html");
-    win.show();
+    let win = new BrowserWindow({
+      width: 400,
+      height: 320,
+      webPreferences: {
+        nodeIntegration: true,
+      },
+    });
+    win.loadFile("./selectScreen.html");
+    win.removeMenu();
+    win.webContents.openDevTools();
     console.log(screenWindow);
     win.on("close", () => {
       screenWindow = false;
