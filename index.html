@@ -34,33 +34,27 @@
     <title>Simple Screen</title>
   </head>
   <body>
-    <div class="container pt-2">
-      <div class="row justify-content-center mx-1" style="width: 300;">
-        <div class="btn-group pr-3">
-          <button class="btn btn-sm btn-light form-check">
-            <label class="form-check-label active">
-                <input type="radio" checked="" name="res720p" id="res720" > 720p              
-            </label>
-          </button>
-          <button type="button" class="btn btn-sm btn-light form-check">
-            <label class="form-check-label">
-                <input type="radio" name="res720p" id="res720"> 1080p
-            </label>
-            </button>
+    <div class="container pt-3">
+      <div class="row justify-content-center" >
+        <div class="btn-group btn-group-toggle pr-4" data-toggle="buttons">
+          <label class="btn btn-secondary btn-sm active">
+            <input type="radio" name="options" id="option1" autocomplete="off" checked> 720p
+          </label>
+          <label class="btn btn-secondary btn-sm">
+            <input type="radio" name="options" id="option2" autocomplete="off"> 1080p
+          </label>
+      
         </div>
+
         <button type="button" class="btn btn-sm btn-info" id="selectScreen">Select screen</button>
       </div>
     </div>
-    <div class="container pt-2">
-
+    <div class="container pt-3">
+     <div class="container-fluid pl-0" style="width: 250px;align-content: start;">
+      <small> Destination folder</small>
+     </div>
       <div class="row justify-content-center">
-
-       <small> Destination Folder</small>
         
-      </div>
-      
-      <div class="row justify-content-center">
-    
         <div class="input-group input-group-sm mb-3 pt-1" style="width: 250px;">
           <input
             type="text"
@@ -76,8 +70,8 @@
         </div>
       </div>
     </div>
-    <div class="container pt-3">
-      <div class="row justify-content-center pb-2">
+    <div class="container pt-2">
+      <div class="row justify-content-center pb-3">
         <div class="dropdown">
           <button
             class="btn btn-light dropdown-toggle btn-outline-secondary btn-sm"
@@ -99,9 +93,9 @@
         </div>
       </div>
 
-      <div class="container" id="audio-meter-section"></div>
+      <div class="container " id="audio-meter-section" style="width: 250px;"></div>
 
-      <div class="row justify-content-center pt-3">
+      <div class="row justify-content-center pt-4">
        
         <button
           type="button"
@@ -112,12 +106,7 @@
           Start Recording
         </button>
       </div>
-      <!-- <div class="row justify-content-center pt-4">
-        <button type="button" class="btn btn-primary" id="save-dialog">
-          Save
-        </button>
-      </div>
-    </div> -->
+
 
     <script>
       if (typeof module === "object") {
