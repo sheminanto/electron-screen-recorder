@@ -50,8 +50,8 @@ let blob;
 let buffer;
 let screenWindow = false;
 let destination = null;
-
 let _converToMp4 = false;
+
 const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
 

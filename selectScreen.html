@@ -15,25 +15,30 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
-      integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
-      crossorigin="anonymous"
-    />
 
     <link
       rel="stylesheet"
       href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
-    <!-- <link
-      rel="stylesheet"
-      href="./static/materialize/css/materialize.min.css"
-    /> -->
 
     <title>Select Screen</title>
   </head>
   <body>
     hello
+
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <!-- <script src="./static/materialize/js/materialize.min.js"></script> -->
+    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./static/popper/popper.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
+    <script src="./selectScreen.js"></script>
   </body>
 </html>
