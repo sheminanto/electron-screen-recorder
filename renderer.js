@@ -8,8 +8,6 @@
 const { desktopCapturer, remote, ipcRenderer } = require("electron");
 const { BrowserWindow } = require("electron").remote;
 const { ipcMain } = require("electron");
-const selectScreen = document.getElementById("selectScreen");
-const saveBtn = document.getElementById("save-dialog");
 
 const { dialog } = require("electron").remote;
 let path = require("path");
@@ -36,8 +34,8 @@ let audioContext = new AudioContext();
 let dest = audioContext.createMediaStreamDestination();
 let audiodevices;
 
-let _screenWidth = 1980;
-let _screenHeight = 1080;
+let _screenWidth;
+let _screenHeight;
 let _recordingState = false;
 let audstream;
 let _audioSources;
@@ -54,6 +52,8 @@ let _converToMp4 = false;
 
 const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
+const selectScreenBtn = document.getElementById("selectScreen");
+const saveBtn = document.getElementById("save-dialog");
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -205,6 +205,7 @@ async function setScreen(sourceid) {
 
 startBtn.onclick = () => {
   if (_recordingState == false) {
+    setScreenResolution();
     let videoStream = setScreen("screen:0:0");
     filePath = "./recorded/";
     fileName = "data.webm";
@@ -257,7 +258,10 @@ async function handleDataAvailable(e) {
 }
 
 async function handleStop(stream) {
-  stream.getVideoTracks().forEach((track) => track.stop());
+  setTimeout(() => {
+    console.log("timeout");
+    stream.getVideoTracks().forEach((track) => track.stop());
+  }, 1000);
 
   startBtn.className = "btn btn-success";
   startBtn.innerText = "Start Recording";
@@ -349,8 +353,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Select Screen
-
-selectScreen.addEventListener("click", (event) => {
+selectScreenBtn.addEventListener("click", (event) => {
   if (screenWindow == false) {
     screenWindow = true;
     let win = new BrowserWindow({
@@ -379,3 +382,30 @@ remote.ipcMain.on("channel", (event, message) => {
   console.log("message is " + message);
   event.sender.send("channel", "hai");
 });
+
+//  function to set the screen resolution
+function setScreenResolution() {
+  document.getElementsByName("options").forEach((item) => {
+    if (item.checked) {
+      console.log(item.value);
+      switch (item.value) {
+        case "720":
+          _screenHeight = 720;
+          _screenWidth = 1280;
+          break;
+        case "1080":
+          _screenHeight = 1080;
+          _screenWidth = 1920;
+          break;
+
+        default:
+          console.log(
+            "error in setScreenResolution. Screen resolution set to 1080p"
+          );
+          _screenHeight = 1080;
+          _screenWidth = 1920;
+          break;
+      }
+    }
+  });
+}
