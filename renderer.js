@@ -371,3 +371,8 @@ selectScreen.addEventListener("click", (event) => {
     });
   }
 });
+
+remote.ipcMain.on("channel", (event, message) => {
+  console.log("message is " + message);
+  event.sender.send("channel", "hai");
+});

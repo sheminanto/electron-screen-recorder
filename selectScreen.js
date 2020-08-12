@@ -1,4 +1,4 @@
-const { desktopCapturer, remote } = require("electron");
+const { desktopCapturer, remote, ipcRenderer } = require("electron");
 let screencount = 1;
 let newRow;
 let selectedScreen;
@@ -56,3 +56,9 @@ function one(ele) {
   document.getElementById("preview").innerHTML = `<img src="${thumbpreview}">`;
   document.getElementById("footer").innerText = ele.name;
 }
+
+ipcRenderer.send("channel", "message");
+
+ipcRenderer.on("channel", (event, message) => {
+  console.log("message is " + message);
+});
