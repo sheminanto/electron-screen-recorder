@@ -354,7 +354,7 @@ selectScreen.addEventListener("click", (event) => {
   if (screenWindow == false) {
     screenWindow = true;
     let win = new BrowserWindow({
-      width: 650,
+      width: 450,
       height: 550,
       webPreferences: {
         nodeIntegration: true,
