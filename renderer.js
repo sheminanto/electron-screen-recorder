@@ -5,9 +5,9 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { desktopCapturer, remote } = require("electron");
+const { desktopCapturer, remote, ipcRenderer } = require("electron");
 const { BrowserWindow } = require("electron").remote;
-const { ipcRenderer } = require("electron");
+const { ipcMain } = require("electron");
 const selectScreen = document.getElementById("selectScreen");
 const saveBtn = document.getElementById("save-dialog");
 
@@ -354,8 +354,8 @@ selectScreen.addEventListener("click", (event) => {
   if (screenWindow == false) {
     screenWindow = true;
     let win = new BrowserWindow({
-      width: 400,
-      height: 320,
+      width: 350,
+      height: 550,
       webPreferences: {
         nodeIntegration: true,
       },
