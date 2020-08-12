@@ -54,6 +54,9 @@ const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
 const selectScreenBtn = document.getElementById("selectScreen");
 const saveBtn = document.getElementById("save-dialog");
+const _resolutionBtnGroup = document.getElementsByName("options");
+const _inputDestination = document.getElementById("inputDestination");
+const _dropDownAudioMenuButton = document.getElementById("dropdownMenuButton");
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -205,6 +208,7 @@ async function setScreen(sourceid) {
 
 startBtn.onclick = () => {
   if (_recordingState == false) {
+    disableAll();
     setScreenResolution();
     let videoStream = setScreen("screen:0:0");
     filePath = "./recorded/";
@@ -232,6 +236,7 @@ startBtn.onclick = () => {
       }
     });
   } else {
+    enableAll();
     try {
       mediaRecorder.stop();
     } catch (error) {
@@ -339,7 +344,7 @@ saveBtn.addEventListener("click", (event) => {
     .then((selectedPath) => {
       if (selectedPath) {
         console.log(selectedPath.filePaths);
-        document.getElementById("path").value = selectedPath.filePaths;
+        _inputDestination.value = selectedPath.filePaths;
       }
     });
 });
@@ -385,7 +390,7 @@ remote.ipcMain.on("channel", (event, message) => {
 
 //  function to set the screen resolution
 function setScreenResolution() {
-  document.getElementsByName("options").forEach((item) => {
+  _resolutionBtnGroup.forEach((item) => {
     if (item.checked) {
       console.log(item.value);
       switch (item.value) {
@@ -408,4 +413,22 @@ function setScreenResolution() {
       }
     }
   });
+}
+
+function disableAll() {
+  _resolutionBtnGroup.forEach((item) =>
+    item.setAttribute("disabled", "disabled")
+  );
+  saveBtn.setAttribute("disabled", "disabled");
+  selectScreenBtn.setAttribute("disabled", "disabled");
+  _inputDestination.setAttribute("disabled", "disabled");
+  _dropDownAudioMenuButton.setAttribute("disabled", "disabled");
+}
+
+function enableAll() {
+  _resolutionBtnGroup.forEach((item) => item.removeAttribute("disabled"));
+  saveBtn.removeAttribute("disabled");
+  selectScreenBtn.removeAttribute("disabled");
+  _inputDestination.removeAttribute("disabled");
+  _dropDownAudioMenuButton.removeAttribute("disabled");
 }
