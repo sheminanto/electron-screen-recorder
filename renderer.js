@@ -362,6 +362,9 @@ selectScreen.addEventListener("click", (event) => {
     });
     win.loadFile("./selectScreen.html");
     win.removeMenu();
+    win.webContents.once("dom-ready", (event) => {
+      event.sender.send("channel", "ok-ready");
+    });
     win.webContents.openDevTools();
     console.log(screenWindow);
     win.on("close", () => {
