@@ -36,15 +36,15 @@
   <body>
     <div class="container pt-3">
       <div class="row justify-content-center" >
-        <div class="btn-group btn-group-toggle pr-4" data-toggle="buttons">
+        <div class="btn-group btn-group-toggle pr-4  " data-toggle="buttons" >
           <label class="btn btn-secondary btn-sm active">
-            <input type="radio" name="options" id="option1" autocomplete="off" checked> 720p
+            <input type="radio" name="options" id="option1" autocomplete="off" checked  value="720"> 720p
           </label>
           <label class="btn btn-secondary btn-sm">
-            <input type="radio" name="options" id="option2" autocomplete="off"> 1080p
+            <input type="radio" name="options" id="option2" autocomplete="off"  value="1080"> 1080p
           </label>
-      
         </div>
+      
 
         <button type="button" class="btn btn-sm btn-info" id="selectScreen">Select screen</button>
       </div>
@@ -55,12 +55,13 @@
      </div>
       <div class="row justify-content-center">
         
-        <div class="input-group input-group-sm mb-3 pt-1" style="width: 250px;">
+        <div class="input-group input-group-sm mb-3 pt-1 " style="width: 250px;">
           <input
             type="text"
-            class="form-control"
+            class="form-control "
             placeholder="Set destination folder"
-            id="path"
+            id="inputDestination"
+            
           />
           <div class="input-group-append">
             <button class="btn btn-secondary" id="save-dialog">
