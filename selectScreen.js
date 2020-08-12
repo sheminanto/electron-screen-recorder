@@ -29,13 +29,13 @@ getScreenSources().then((sources) => {
     //   screens.appendChild(newRow);
     // }
     let thumb1 = document.createElement("div");
-    thumb1.className = "row justify-content-start";
-    thumb1.style = "width:275px";
+    thumb1.className = "row justify-content-start pt-2 mx-1";
+    // thumb1.style = "width:275px";
     let img1 = document.createElement("img");
     img1.src = source.thumbnail.toDataURL();
     img1.id = source.id + "img";
     console.log(img1.id);
-    thumb1.innerHTML = `<div class="row ml-3 pt-1" style="width:230px">
+    thumb1.innerHTML = `<div class="card pt-1">
                           <a class="dropdown-item pt-1" id="${source.id}" name="${source.name}" onclick="one(this)" data-toggle="tooltip" title="${source.name}">
                              <img src=${img1.src} id=${img1.id} class="rounded float-right" >
                           </a>
