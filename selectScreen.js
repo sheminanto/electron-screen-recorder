@@ -35,14 +35,20 @@ getScreenSources().then((sources) => {
     img1.src = source.thumbnail.toDataURL();
     img1.id = source.id + "img";
     console.log(img1.id);
-    thumb1.innerHTML = `<div class="row ml-3 pt-1" style="width:230px"><a class="dropdown-item pt-1" id="${source.id}" name="${source.name}" onclick="one(this)" data-toggle="tooltip" title="${source.name}">${screencount}. <img src=${img1.src} id=${img1.id} class="rounded float-right" ></a></div> `;
-    thumbList.appendChild(thumb1);
+    thumb1.innerHTML = `<div class="row ml-3 pt-1" style="width:230px">
+                          <a class="dropdown-item pt-1" id="${source.id}" name="${source.name}" onclick="one(this)" data-toggle="tooltip" title="${source.name}">
+                             <img src=${img1.src} id=${img1.id} class="rounded float-right" >
+                          </a>
+                        </div> `;
+    screens.appendChild(thumb1);
     screencount++;
   }
-  thumbpreview = document.getElementById("screen:0:0img").src;
-  console.log(thumbpreview);
-  document.getElementById("preview").innerHTML = `<img src="${thumbpreview}">`;
-  document.getElementById("footer").innerText = "Entire Screen";
+  // thumbpreview = document.getElementById("screen:0:0img").src;
+  // console.log(thumbpreview);
+  // document.getElementById(
+  //   "preview"
+  // ).innerHTML = `<img class="thumbnail"src="${thumbpreview}">`;
+  // document.getElementById("footer").innerText = "Entire Screen";
 });
 
 function one(ele) {
@@ -53,8 +59,10 @@ function one(ele) {
   console.log(document.getElementById(currentSelection));
   thumbpreview = document.getElementById(currentSelection).src;
   console.log(thumbpreview);
-  document.getElementById("preview").innerHTML = `<img src="${thumbpreview}">`;
-  document.getElementById("footer").innerText = ele.name;
+  // document.getElementById(
+  //   "preview"
+  // ).innerHTML = `<img class="thumbnail"src="${thumbpreview}">`;
+  // document.getElementById("footer").innerText = ele.name;
 }
 
 ipcRenderer.send("channel", "message");
