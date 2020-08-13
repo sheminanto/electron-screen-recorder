@@ -230,7 +230,7 @@ startBtn.onclick = () => {
       mediaRecorder.ondataavailable = handleDataAvailable;
       mediaRecorder.onstop = () => handleStop(stream);
       try {
-        mediaRecorder.start(100);
+        mediaRecorder.start(1000);
       } catch (error) {
         console.log(error);
       }
@@ -258,15 +258,16 @@ async function handleDataAvailable(e) {
     // type: "video/webm; codecs=vp9 ",
   });
   buffer = Buffer.from(await blob.arrayBuffer());
-  await streamsav.write(buffer);
+  streamsav.write(buffer);
   recordedChunks = [];
 }
 
 async function handleStop(stream) {
   setTimeout(() => {
+    streamsav.end();
     console.log("timeout");
     stream.getVideoTracks().forEach((track) => track.stop());
-  }, 1000);
+  }, 2000);
 
   startBtn.className = "btn btn-success";
   startBtn.innerText = "Start Recording";
