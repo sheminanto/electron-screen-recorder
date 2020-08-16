@@ -48,7 +48,7 @@ let blob;
 let buffer;
 let screenWindow = false;
 let destination = null;
-const _converToMp4 = document.getElementById("mp4-convert").checked;
+const _converToMp4 = document.getElementById("mp4-convert");
 
 const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
@@ -272,14 +272,14 @@ async function handleStop(stream) {
   setTimeout(() => {
     streamsav.end();
     console.log("timeout");
-    console.log(_converToMp4);
+    console.log(_converToMp4.checked);
+    if (_converToMp4.checked) _convert();
     stream.getVideoTracks().forEach((track) => track.stop());
-  }, 2000);
+  }, 1000);
 
   startBtn.className = "btn btn-success";
   startBtn.innerText = "Start Recording";
   _recordingState = false;
-  if (_converToMp4 == true) await _convert();
 }
 
 async function _convert() {
