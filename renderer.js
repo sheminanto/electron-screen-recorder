@@ -10,14 +10,14 @@ const { BrowserWindow } = require("electron").remote;
 const { ipcMain } = require("electron");
 const { dialog } = require("electron").remote;
 let currentScreen;
-getScreenSources().then((sources) => currentScreen=sources[0].id); // screen to recorded currently is set using this
+getScreenSources().then((sources) => (currentScreen = sources[0].id)); // screen to recorded currently is set using this
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
 
 let ffmpeg = require("fluent-ffmpeg");
-const { time } = require("console");
-const { title } = require("process");
+// const { time } = require("console");
+// const { title } = require("process");
 
 // setting the path of ffmpeg in development and production versions
 ffmpeg.setFfmpegPath("./resources/app/win-ffmpeg/bin/ffmpeg.exe");
@@ -38,17 +38,16 @@ let audiodevices;
 let _screenWidth;
 let _screenHeight;
 let _recordingState = false;
-let audstream;
 let _audioSources;
 let _audioDevicesCount = 0;
 let streamsav;
-let filePath;
+let filePath = remote.app.getPath("videos") + "\\";
 let fileName;
 let fileExt;
 let blob;
 let buffer;
 let screenWindow = false;
-let destination = null;
+
 const _converToMp4 = document.getElementById("mp4-convert");
 
 const startBtn = document.getElementById("startBtn");
@@ -58,6 +57,7 @@ const saveBtn = document.getElementById("save-dialog");
 const _resolutionBtnGroup = document.getElementsByName("options");
 const _inputDestination = document.getElementById("inputDestination");
 const _dropDownAudioMenuButton = document.getElementById("dropdownMenuButton");
+_inputDestination.value = filePath;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -175,21 +175,6 @@ async function getScreenSources() {
     types: ["window", "screen"],
   });
 }
-let _screenSources = getScreenSources();
-
-// getScreenSources().then((sources) => {
-//   for (const source of sources) {
-//     let img1 = document.createElement("img");
-//     img1.src = source.thumbnail.toDataURL();
-//     document.getElementById("id1").appendChild(img1);
-//   }
-// });
-
-async function getScreenSources() {
-  return await desktopCapturer.getSources({
-    types: ["window", "screen"],
-  });
-}
 
 async function setScreen(sourceid) {
   try {
@@ -224,8 +209,8 @@ startBtn.onclick = () => {
     disableAll();
     setScreenResolution();
     let videoStream = setScreen(currentScreen);
-    filePath = "./recorded/";
-    fileName = "data.webm";
+    // filePath = "./recorded/";
+    fileName = "data";
     fileExt = ".webm";
     fileName = fileCheck(filePath, fileName, fileExt, 0);
     streamsav = fs.createWriteStream(filePath + fileName + fileExt);
@@ -325,7 +310,7 @@ async function _convert() {
 function fileCheck(filePath, fileName, fileExt, _fileCount) {
   let tempName = "";
   try {
-    fileName = path.basename(filePath + fileName, fileExt);
+    // fileName = path.basename(filePath + fileName, fileExt);
     _fileCount == 0 ? (tempName = "") : (tempName = `(${_fileCount})`);
     if (fs.existsSync(filePath + fileName + tempName + fileExt)) {
       _fileCount += 1;
@@ -359,8 +344,8 @@ saveBtn.addEventListener("click", (event) => {
     })
     .then((selectedPath) => {
       if (selectedPath) {
-        console.log(selectedPath.filePaths);
         _inputDestination.value = selectedPath.filePaths;
+        filePath = selectedPath.filePaths + "\\";
       }
     });
 });
