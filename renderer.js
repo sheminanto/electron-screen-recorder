@@ -8,8 +8,8 @@
 const { desktopCapturer, remote, ipcRenderer } = require("electron");
 const { BrowserWindow } = require("electron").remote;
 const { ipcMain } = require("electron");
-
 const { dialog } = require("electron").remote;
+let currentScreen = "screen:0:0"; // screen to recorded currently is set using this
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
@@ -48,7 +48,7 @@ let blob;
 let buffer;
 let screenWindow = false;
 let destination = null;
-let _converToMp4 = false;
+const _converToMp4 = document.getElementById("mp4-convert").checked;
 
 const startBtn = document.getElementById("startBtn");
 const _dropDownAudioInput = document.getElementById("dropdown-audioinput");
@@ -90,6 +90,12 @@ _audioSources.then(async (sources) => {
     let _audioLevel;
     let stream;
     let audioMonitor;
+    let sourceLabel =
+      source.label.length > 30
+        ? source.label.slice(0, 29) + "..."
+        : source.label;
+    console.log(sourceLabel);
+    console.log(source.deviceId);
     const _audioMeter = document.createElement("div");
     const _dropDownitem = document.createElement("a");
     let progressBAr;
@@ -103,7 +109,7 @@ _audioSources.then(async (sources) => {
           aria-valuemax="100"
           id="audio-meter-${source.deviceId}"
         ></div>
-      </div><small>${source.label}</small>
+      </div><small data-toggle="tooltip" title="${source.label}">${sourceLabel}</small>
     </div>`;
 
     _dropDownitem.className = "dropdown-item ";
@@ -115,7 +121,7 @@ _audioSources.then(async (sources) => {
         id="${source.deviceId}"
       />
       <label class="custom-control-label" for="${source.deviceId}">
-      <small>  ${source.label}</small>
+      <small data-toggle="tooltip" title="${source.label}">${sourceLabel}</small>
       </label>
     </div>
   </form>`;
@@ -210,7 +216,7 @@ startBtn.onclick = () => {
   if (_recordingState == false) {
     disableAll();
     setScreenResolution();
-    let videoStream = setScreen("screen:0:0");
+    let videoStream = setScreen(currentScreen);
     filePath = "./recorded/";
     fileName = "data.webm";
     fileExt = ".webm";
@@ -265,6 +271,7 @@ async function handleDataAvailable(e) {
 async function handleStop(stream) {
   setTimeout(() => {
     console.log("timeout");
+    console.log(_converToMp4);
     stream.getVideoTracks().forEach((track) => track.stop());
   }, 1000);
 
@@ -275,6 +282,7 @@ async function handleStop(stream) {
 }
 
 async function _convert() {
+  console.log("inside convert");
   try {
     ffmpeg(filePath + fileName + fileExt)
       .videoCodec("libx264")
@@ -369,12 +377,14 @@ selectScreenBtn.addEventListener("click", (event) => {
       },
     });
     win.loadFile("./selectScreen.html");
-    win.removeMenu();
-    win.webContents.once("dom-ready", (event) => {
-      event.sender.send("channel", "ok-ready");
+    win.setMenuBarVisibility(false);
+    // win.webContents.send("channel", "hello");
+    win.webContents.on("did-finish-load", () => {
+      win.webContents.send("channel", "hello");
     });
     win.webContents.openDevTools();
     console.log(screenWindow);
+
     win.on("close", () => {
       screenWindow = false;
       console.log(screenWindow);
@@ -384,8 +394,22 @@ selectScreenBtn.addEventListener("click", (event) => {
 });
 
 remote.ipcMain.on("channel", (event, message) => {
+  currentScreen = message;
+  console.log("message event:" + event.title);
   console.log("message is " + message);
-  event.sender.send("channel", "hai");
+  // document.getElementById(
+  //   "screen-preview-section"
+  // ).innerHTML = `<img src="${message}" class="mx-auto d-block">`;
+  event.sender.send("channel", currentScreen);
+});
+
+remote.ipcMain.on("did-finish-load", (event, message) => {
+  event.sender.send("did-finish-load", currentScreen);
+  console.log("message event:" + event.title);
+  console.log("message is " + message);
+  // document.getElementById(
+  //   "screen-preview-section"
+  // ).innerHTML = `<img src="${message}" class="mx-auto d-block">`;
 });
 
 //  function to set the screen resolution

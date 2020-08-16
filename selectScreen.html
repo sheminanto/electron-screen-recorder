@@ -24,53 +24,32 @@
     <title>Select Screen</title>
   </head>
   <body>
-    <div id="thumb px-2" class="container">
+    <div id="thumb" class="container my-3 py-2">
       <div class="row px-2" id="screens"></div>
-      <!-- <div class="row justify-content-center pt-4">
-        <div class="card" style="width: 300; height: 600;">
-          <div
-            class="card-header text-center bg-secondary"
-            style="color: aliceblue;"
+    </div>
+    <div class="container mt-4 pt-4">
+      <nav
+        class="navbar navbar-expand-sm bg-dark navbar-dark fixed-bottom mt-2 justify-content-end"
+      >
+        <div class="row pr-1">
+          <button
+            type="button"
+            id="okBtn"
+            class="btn btn-sm btn-success mx-1"
+            style="width: 75px;"
           >
-            Select screen for recording
-          </div>
-          <div class="card-body" id="screenList" style="height: 300px;">
-            <div class="dropdown justify-content-center" style="width: 250px;">
-              <button
-                style="width: 250px;"
-                class="btn btn-light dropdown-toggle"
-                type="button"
-                data-toggle="dropdown"
-              >
-                Available screens
-              </button>
-              <div
-                class="dropdown-menu"
-                id="thumbList"
-                style="width: 250px; max-height: 225px; overflow-y: auto;"
-              ></div>
-            </div>
-            <div class="row justify-content-center pt-4">Current Selection</div>
-            <div id="preview" class="row justify-content-center pt-4"></div>
-          </div>
-          <div
-            class="card-footer justify-content-center"
-            style="width: 300px;"
-            id="footer"
-          ></div> -->
+            OK
+          </button>
+          <button
+            type="button"
+            id="cancelBtn"
+            class="btn btn-sm btn-light mx-1"
+            style="width: 75px;"
+          >
+            Cancel
+          </button>
         </div>
-        <div class="container justify-content-center pt-2" id="preview">
-
-        </div>
-        <!-- <button
-          type="button"
-          class="btn btn-success"
-          id="okBtn"
-          style="width: 50px;"
-        >
-          OK
-        </button> -->
-      </div>
+      </nav>
     </div>
 
     <script>
