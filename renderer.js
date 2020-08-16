@@ -61,13 +61,15 @@ _inputDestination.value = filePath;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
-    console.log(devices);
+    // console.log(devices);
     audiodevices = devices.filter(
       (d) =>
-        d.kind === "audioinput" &&
+        (d.kind === "audioinput" ||
+        d.kind === "audiooutput") &&
         d.deviceId != "communications" &&
         d.deviceId != "default"
     );
+    console.log(audiodevices);
     return audiodevices;
   });
 }
