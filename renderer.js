@@ -9,7 +9,8 @@ const { desktopCapturer, remote, ipcRenderer } = require("electron");
 const { BrowserWindow } = require("electron").remote;
 const { ipcMain } = require("electron");
 const { dialog } = require("electron").remote;
-let currentScreen = "screen:0:0"; // screen to recorded currently is set using this
+let currentScreen;
+getScreenSources().then((sources) => currentScreen=sources[0].id); // screen to recorded currently is set using this
 let path = require("path");
 let fs = require("fs");
 let Hark = require("hark");
@@ -183,6 +184,12 @@ let _screenSources = getScreenSources();
 //     document.getElementById("id1").appendChild(img1);
 //   }
 // });
+
+async function getScreenSources() {
+  return await desktopCapturer.getSources({
+    types: ["window", "screen"],
+  });
+}
 
 async function setScreen(sourceid) {
   try {
