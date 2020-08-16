@@ -41,7 +41,7 @@ let _recordingState = false;
 let _audioSources;
 let _audioDevicesCount = 0;
 let streamsav;
-let filePath = remote.app.getPath("videos") + "\\";
+let filePath = remote.app.getPath("videos") + "/";
 let fileName;
 let fileExt;
 let blob;
@@ -61,6 +61,7 @@ _inputDestination.value = filePath;
 
 async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
+    console.log(devices);
     audiodevices = devices.filter(
       (d) =>
         d.kind === "audioinput" &&
@@ -351,6 +352,7 @@ saveBtn.addEventListener("click", (event) => {
 });
 // For testing purposes.
 const { webFrame } = require("electron");
+const { Console } = require("console");
 document.addEventListener("keydown", (e) => {
   if (e.key == "c") {
     webFrame.clearCache();
