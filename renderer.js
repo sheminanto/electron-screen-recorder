@@ -304,16 +304,16 @@ async function _convert() {
   }
 }
 
-async function handleStream(stream) {
-  let video = document.createElement("video");
-  video.srcObject = stream;
-  video.width = "200";
-  video.autoplay = true;
-  video.muted = true;
-  let element = document.getElementById("id1");
-  element.appendChild(video);
-  video.onloadedmetadata = (e) => video.play();
-}
+// async function handleStream(stream) {
+//   let video = document.createElement("video");
+//   video.srcObject = stream;
+//   video.width = "200";
+//   video.autoplay = true;
+//   video.muted = true;
+//   let element = document.getElementById("id1");
+//   element.appendChild(video);
+//   video.onloadedmetadata = (e) => video.play();
+// }
 
 function fileCheck(filePath, fileName, fileExt, _fileCount) {
   let tempName = "";
@@ -371,9 +371,11 @@ selectScreenBtn.addEventListener("click", (event) => {
   if (screenWindow == false) {
     screenWindow = true;
     let win = new BrowserWindow({
+      resizable: false,
       width: 450,
       height: 550,
       webPreferences: {
+        // devTools: false,
         nodeIntegration: true,
       },
     });
@@ -383,7 +385,7 @@ selectScreenBtn.addEventListener("click", (event) => {
     win.webContents.on("did-finish-load", () => {
       win.webContents.send("channel", "hello");
     });
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     console.log(screenWindow);
 
     win.on("close", () => {
