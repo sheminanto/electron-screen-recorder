@@ -63,7 +63,7 @@ async function getAudioSources() {
   return navigator.mediaDevices.enumerateDevices().then((devices) => {
     audiodevices = devices.filter(
       (d) =>
-        (d.kind === "audioinput" || d.kind === "audiooutput") &&
+        d.kind === "audioinput" &&
         d.deviceId != "communications" &&
         d.deviceId != "default"
     );
