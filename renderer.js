@@ -1,10 +1,3 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// No Node.js APIs are available in this process because
-// `nodeIntegration` is turned off. Use `preload.js` to
-// selectively enable features needed in the rendering
-// process.
-
 const { desktopCapturer, remote, ipcRenderer } = require("electron");
 const { BrowserWindow } = require("electron").remote;
 const { ipcMain } = require("electron");
@@ -267,7 +260,10 @@ async function handleStop(stream) {
     console.log("timeout");
     console.log(_converToMp4.checked);
     if (_converToMp4.checked) _convert();
-    stream.getVideoTracks().forEach((track) => track.stop());
+    // setTimeout(() => {
+    //   console.log("stopping stream");
+    //   stream.getVideoTracks().forEach((track) => track.stop());
+    // }, 5000);
   }, 1000);
 
   startBtn.className = "btn btn-success";

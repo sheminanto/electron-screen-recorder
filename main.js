@@ -1,4 +1,3 @@
-// Modules to control application life and create native browser window
 const { app, BrowserWindow } = require("electron");
 
 // app.commandLine.appendSwitch("disable-gpu-vsync");
