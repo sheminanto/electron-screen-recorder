@@ -40,7 +40,7 @@ let fileExt;
 let blob;
 let buffer;
 let screenWindow = false;
-
+let operatingSystem = process.platform;
 const _converToMp4 = document.getElementById("mp4-convert");
 
 const startBtn = document.getElementById("startBtn");
@@ -258,6 +258,7 @@ async function handleStop(stream) {
   setTimeout(() => {
     streamsav.end();
     console.log("timeout");
+    console.log("OS...:",operatingSystem);
     console.log(_converToMp4.checked);
     if (_converToMp4.checked) _convert();
     // setTimeout(() => {
@@ -342,7 +343,8 @@ saveBtn.addEventListener("click", (event) => {
     .then((selectedPath) => {
       if (selectedPath) {
         _inputDestination.value = selectedPath.filePaths;
-        filePath = selectedPath.filePaths + "\\";
+        operatingSystem==="win32" ? filePath = selectedPath.filePaths + "\\" : filePath = selectedPath.filePaths + "/";
+        
       }
     });
 });
