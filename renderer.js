@@ -40,7 +40,7 @@ let fileExt;
 let blob;
 let buffer;
 let screenWindow = false;
-let operatingSystem = process.platform;
+const operatingSystem = process.platform;
 const _converToMp4 = document.getElementById("mp4-convert");
 
 const startBtn = document.getElementById("startBtn");
